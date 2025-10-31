@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "887867897021",
+    "project_id": "cafeshopassignment",
+    "storage_bucket": "cafeshopassignment.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887867897021:android:138c22f0996236409473d4",
+        "android_client_info": {
+          "package_name": "com.example.cafeshopassignment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "REDACTED_FIREBASE_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
