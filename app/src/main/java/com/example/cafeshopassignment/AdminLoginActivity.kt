@@ -18,16 +18,19 @@ class AdminLoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin_login)
 
-        // Initialize Firebase
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // Find Views
         val emailInput = findViewById<EditText>(R.id.adminEmailInput)
         val passwordInput = findViewById<EditText>(R.id.adminPasswordInput)
         val loginButton = findViewById<Button>(R.id.adminLoginButton)
+        val backButton = findViewById<Button>(R.id.backToUserLoginButton)
 
-        // Login Click
+        backButton.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }
+
         loginButton.setOnClickListener {
             val email = emailInput.text.toString().trim()
             val password = passwordInput.text.toString().trim()
@@ -37,30 +40,39 @@ class AdminLoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Firebase sign in
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
+                        val uid = auth.currentUser?.uid
+                        if (uid == null) {
+                            Toast.makeText(this, "User ID not found", Toast.LENGTH_SHORT).show()
+                            return@addOnCompleteListener
+                        }
 
-                        // Get user role from Firestore
                         db.collection("users").document(uid)
                             .get()
                             .addOnSuccessListener { doc ->
-                                val role = doc.getString("role")
-                                if (role == "admin") {
-                                    Toast.makeText(this, "Admin Login Successful", Toast.LENGTH_SHORT).show()
-                                    startActivity(Intent(this, AdminDashboardActivity::class.java))
-                                    finish()
+                                if (doc != null && doc.exists()) {
+                                    val role = doc.getString("role")?.lowercase() ?: "customer"
+
+                                    if (role == "admin") {
+                                        Toast.makeText(this, "Admin Login Successful", Toast.LENGTH_SHORT).show()
+                                        val intent = Intent(this, AdminDashboardActivity::class.java)
+                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        startActivity(intent)
+                                    } else {
+                                        Toast.makeText(this, "Access denied: Not an admin", Toast.LENGTH_SHORT).show()
+                                        auth.signOut()
+                                    }
                                 } else {
-                                    Toast.makeText(this, "Access denied: Not an admin", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, "User record not found in Firestore", Toast.LENGTH_SHORT).show()
                                     auth.signOut()
                                 }
                             }
                             .addOnFailureListener { e ->
-                                Toast.makeText(this, "Failed to fetch user role: ${e.message}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Error getting role: ${e.message}", Toast.LENGTH_SHORT).show()
+                                auth.signOut()
                             }
-
                     } else {
                         Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
