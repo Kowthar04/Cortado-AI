@@ -33,8 +33,8 @@ class MenuActivity : AppCompatActivity() {
             db.collection("users").document(uid).get()
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
-                        val firstName = document.getString("firstName")
-                        welcomeText.text = "Welcome, $firstName!"
+                        val firstname = document.getString("firstName")
+                        welcomeText.text = "Welcome, $firstname!"
                     } else {
                         welcomeText.text = "Welcome!"
                     }

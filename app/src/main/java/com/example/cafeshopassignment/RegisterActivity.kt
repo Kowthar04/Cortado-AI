@@ -23,7 +23,7 @@ class RegisterActivity : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
 
         // Find Views
-        val firstNameInput = findViewById<EditText>(R.id.editTextFirstName)
+        val firstnameInput = findViewById<EditText>(R.id.editTextFirstName)
         val surnameInput = findViewById<EditText>(R.id.editTextSurname)
         val emailInput = findViewById<EditText>(R.id.editTextEmail)
         val passwordInput = findViewById<EditText>(R.id.editTextPassword)
@@ -32,12 +32,12 @@ class RegisterActivity : AppCompatActivity() {
 
         // Sign Up Button
         registerButton.setOnClickListener {
-            val firstName = firstNameInput.text.toString().trim()
+            val firstname = firstnameInput.text.toString().trim()
             val surname = surnameInput.text.toString().trim()
             val email = emailInput.text.toString().trim()
             val password = passwordInput.text.toString().trim()
 
-            if (firstName.isEmpty() || surname.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (firstname.isEmpty() || surname.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -48,7 +48,7 @@ class RegisterActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         // Save additional info in Firestore
                         val user = hashMapOf(
-                            "firstName" to firstName,
+                            "firstname" to firstname,
                             "surname" to surname,
                             "email" to email
                         )

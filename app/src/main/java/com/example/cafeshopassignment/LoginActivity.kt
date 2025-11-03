@@ -2,6 +2,7 @@ package com.example.cafeshopassignment
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -36,17 +37,20 @@ class LoginActivity : AppCompatActivity() {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this, MenuActivity::class.java))
-                        finish()
+                        // Log and redirect safely on the main thread
+                        Log.d("LoginActivity", "Login successful, redirecting to MenuActivity")
+                        runOnUiThread {
+                            Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this, MenuActivity::class.java))
+                            finish() // closes login so user can't go back
+                        }
                     } else {
                         Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
-
         registerRedirect.setOnClickListener {
-            // Navigates to RegisterActivity
+            // Navigates to RegisterActivity so user can register
             startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
