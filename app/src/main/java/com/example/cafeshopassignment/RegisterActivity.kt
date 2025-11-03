@@ -50,7 +50,8 @@ class RegisterActivity : AppCompatActivity() {
                         val user = hashMapOf(
                             "firstname" to firstname,
                             "surname" to surname,
-                            "email" to email
+                            "email" to email,
+                            "role" to "customer"
                         )
 
                         db.collection("users")
