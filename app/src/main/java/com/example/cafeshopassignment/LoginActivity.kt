@@ -23,6 +23,11 @@ class LoginActivity : AppCompatActivity() {
         val passwordInput = findViewById<EditText>(R.id.editTextPassword)
         val loginButton = findViewById<Button>(R.id.loginButton)
         val registerRedirect = findViewById<Button>(R.id.registerRedirectButton)
+        val adminLoginButton = findViewById<Button>(R.id.adminLoginButton)
+
+        adminLoginButton.setOnClickListener {
+            startActivity(Intent(this, AdminLoginActivity::class.java))
+        }
 
         loginButton.setOnClickListener {
             val email = emailInput.text.toString().trim()
