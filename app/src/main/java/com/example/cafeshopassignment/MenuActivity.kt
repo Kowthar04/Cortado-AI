@@ -24,12 +24,12 @@ class MenuActivity : AppCompatActivity() {
         val welcomeText = findViewById<TextView>(R.id.welcomeText)
         val logoutButton = findViewById<Button>(R.id.logoutButton)
 
-        // Get current user UID
+
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val uid = currentUser.uid
 
-            // Fetch user's first name from Firestore
+            // Fetch user's first name from the database in firestore
             db.collection("users").document(uid).get()
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
@@ -43,7 +43,7 @@ class MenuActivity : AppCompatActivity() {
                     Toast.makeText(this, "Failed to load user info: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         } else {
-            // No user logged in (should not happen if flow is correct)
+            //
             welcomeText.text = "Welcome!"
         }
 
