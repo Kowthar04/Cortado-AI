@@ -20,7 +20,7 @@ class MenuAdapter(private var menuList: List<MenuItem>) :
         val item = menuList[position]
         holder.itemName.text = item.name
         holder.itemPrice.text = "£${"%.2f".format(item.price)}"
-        holder.itemDescription.text = item.description
+
     }
 
     override fun getItemCount() = menuList.size
