@@ -1,11 +1,14 @@
-package com.example.cafeshopassignment
+package com.example.cafeshopassignment.adapters
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.cafeshopassignment.R
 import com.example.cafeshopassignment.models.MenuItem
+
 class AdminMenuAdapter (
     private val menuList: MutableList<MenuItem>,
     private val onEdit: (MenuItem) -> Unit,
@@ -33,5 +36,7 @@ class AdminMenuAdapter (
         holder.editButton.setOnClickListener { onEdit(item) }
         holder.deleteButton.setOnClickListener { onDelete(item) }
     }
+
     override fun getItemCount() = menuList.size
+
 }

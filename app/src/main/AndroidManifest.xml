@@ -38,6 +38,10 @@
             android:name=".AdminDashboardActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".ManageMenuActivity"
+            android:exported="true" />
+
 
 
     </application>
