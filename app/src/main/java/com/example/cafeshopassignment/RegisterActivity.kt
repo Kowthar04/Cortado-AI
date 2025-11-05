@@ -18,11 +18,11 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        // Initialize Firebase
+
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // Find Views
+
         val firstnameInput = findViewById<EditText>(R.id.editTextFirstName)
         val surnameInput = findViewById<EditText>(R.id.editTextSurname)
         val emailInput = findViewById<EditText>(R.id.editTextEmail)
@@ -30,7 +30,7 @@ class RegisterActivity : AppCompatActivity() {
         val registerButton = findViewById<Button>(R.id.registerButton)
         val loginRedirect = findViewById<Button>(R.id.loginRedirectButton)
 
-        // Sign Up Button
+
         registerButton.setOnClickListener {
             val firstname = firstnameInput.text.toString().trim()
             val surname = surnameInput.text.toString().trim()
@@ -42,11 +42,11 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Create user with Firebase Authentication
+
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        // Save additional info in Firestore
+
                         val user = hashMapOf(
                             "firstname" to firstname,
                             "surname" to surname,
@@ -59,7 +59,7 @@ class RegisterActivity : AppCompatActivity() {
                             .set(user)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
-                                // Go to login page
+
                                 startActivity(Intent(this, LoginActivity::class.java))
                                 finish()
                             }
@@ -73,7 +73,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
         }
 
-        // Redirect to Login
+
         loginRedirect.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
