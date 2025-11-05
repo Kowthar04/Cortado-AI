@@ -4,33 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:padding="16dp">
 
     <EditText
         android:id="@+id/itemNameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Item Name"
-        android:inputType="textPersonName"
-        android:padding="10dp" />
+        android:hint="Item Name" />
 
     <EditText
         android:id="@+id/itemPriceInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Price (£)"
-        android:inputType="numberDecimal"
-        android:padding="10dp"
-        android:layout_marginTop="10dp" />
+        android:hint="Price"
+        android:inputType="numberDecimal" />
 
     <EditText
         android:id="@+id/itemCategoryInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Category (e.g., Drinks, Pastries)"
-        android:inputType="textPersonName"
-        android:padding="10dp"
-        android:layout_marginTop="10dp" />
+        android:hint="Category" />
 
 </LinearLayout>
+
+
