@@ -27,7 +27,7 @@ class AdminDashboardActivity : AppCompatActivity() {
         if (currentUser != null) {
             val uid = currentUser.uid
 
-            // Fetch admin name from Firestore
+
             db.collection("users").document(uid)
                 .get()
                 .addOnSuccessListener { document ->
