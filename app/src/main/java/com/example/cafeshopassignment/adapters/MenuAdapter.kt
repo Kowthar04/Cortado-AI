@@ -26,9 +26,16 @@ class MenuAdapter(private var menuList: List<MenuItem>) :
     override fun getItemCount() = menuList.size
 
 
+
+
     class MenuViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemName: TextView = itemView.findViewById(R.id.itemName)
         val itemPrice: TextView = itemView.findViewById(R.id.itemPrice)
         val itemDescription: TextView = itemView.findViewById(R.id.itemDescription)
+    }
+
+    fun updateData(newList: List<MenuItem>) {
+        menuList = newList
+        notifyDataSetChanged() // tells the RecyclerView to refresh
     }
 }
