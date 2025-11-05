@@ -24,12 +24,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp" />
 
-    <TextView
-        android:id="@+id/itemDescription"
-        android:textSize="14sp"
-        android:textColor="@android:color/black"
+    <Button
+        android:id="@+id/addToCartButton"
+        android:text="Add"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp" />
+        android:layout_height="wrap_content"/>
+
+
 
 </LinearLayout>
