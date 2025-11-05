@@ -25,6 +25,8 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
+        //firebase database
+
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
