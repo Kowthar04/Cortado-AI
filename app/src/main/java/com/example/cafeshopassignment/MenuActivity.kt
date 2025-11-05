@@ -54,23 +54,36 @@ class MenuActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
 
+        // Get current user UID
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            db.collection("users").document(currentUser.uid).get()
-                .addOnSuccessListener { document ->
-                    val firstname = document.getString("firstName") ?: "User"
+            val uid = currentUser.uid
+        // Fetch user's first name from Firestore
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val firstname =
+                        document.getString("firstname")
                     welcomeText.text = "Welcome, $firstname!"
+                } else {
+                    welcomeText.text = "Welcome!"
                 }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to load user info: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         } else {
-            welcomeText.text = "Welcome!"
+        // No user logged in (should not happen if flow is correct)
+        welcomeText.text = "Welcome!"
         }
-
         logoutButton.setOnClickListener {
             auth.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
     }
+
+
 
     private fun loadMenuItems(category: String) {
         db.collection("menuItems")

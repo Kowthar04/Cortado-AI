@@ -24,12 +24,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp" />
 
-    <TextView
-        android:id="@+id/itemDescription"
-        android:textSize="14sp"
-        android:textColor="@android:color/black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp" />
+
 
 </LinearLayout>
