@@ -25,8 +25,6 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
-        //firebase database
-
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
@@ -34,50 +32,37 @@ class MenuActivity : AppCompatActivity() {
         val logoutButton = findViewById<Button>(R.id.logoutButton)
         val categoryTabs = findViewById<TabLayout>(R.id.categoryTabs)
         menuRecyclerView = findViewById(R.id.menuRecyclerView)
-
         menuRecyclerView.layoutManager = LinearLayoutManager(this)
-        menuAdapter = MenuAdapter(emptyList())
+
+        // ✅ Create adapter
+        menuAdapter = MenuAdapter(emptyList()) { menuItem ->
+            Toast.makeText(this, "${menuItem.name} added to cart!", Toast.LENGTH_SHORT).show()
+        }
         menuRecyclerView.adapter = menuAdapter
 
-        // Add specific category tabs
-        val categories = listOf("Drinks", "Breakfast", "Lunch", "Pastries")
+        val categories = listOf("Drinks", "Breakfast", "Lunch", "Pastries & Sweets")
         categories.forEach { categoryTabs.addTab(categoryTabs.newTab().setText(it)) }
 
-        // Load items for the first tab (Drinks)
-        loadMenuItems("Drinks")
+        loadMenuItems(categories[0])
 
         categoryTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                val category = tab.text.toString()
-                loadMenuItems(category)
+                loadMenuItems(tab.text.toString())
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {}
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
 
-        // Get current user UID
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val uid = currentUser.uid
-        // Fetch user's first name from Firestore
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val firstname =
-                        document.getString("firstname")
-                    welcomeText.text = "Welcome, $firstname!"
-                } else {
-                    welcomeText.text = "Welcome!"
+            db.collection("users").document(uid).get()
+                .addOnSuccessListener { document ->
+                    welcomeText.text = "Welcome, ${document.getString("firstName")}!"
                 }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to load user info: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-        // No user logged in (should not happen if flow is correct)
-        welcomeText.text = "Welcome!"
         }
+
         logoutButton.setOnClickListener {
             auth.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
@@ -85,18 +70,27 @@ class MenuActivity : AppCompatActivity() {
         }
     }
 
-
-
     private fun loadMenuItems(category: String) {
         db.collection("menuItems")
             .whereEqualTo("category", category)
             .get()
             .addOnSuccessListener { documents ->
-                val menuList = documents.mapNotNull { it.toObject(MenuItem::class.java) }
+
+                val menuList = documents.map { doc ->
+                    MenuItem(
+                        id = doc.id,
+                        name = doc.getString("name") ?: "",
+                        category = doc.getString("category") ?: "",
+                        price = doc.getDouble("price") ?: 0.0,
+                        active = doc.getBoolean("active") ?: true
+                    )
+                }
+
                 menuAdapter.updateData(menuList)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to load items: ${e.message}", Toast.LENGTH_SHORT).show()
+
+                if (menuList.isEmpty()) {
+                    Toast.makeText(this, "No items in $category", Toast.LENGTH_SHORT).show()
+                }
             }
     }
 }

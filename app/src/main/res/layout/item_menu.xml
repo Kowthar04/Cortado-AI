@@ -24,6 +24,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp" />
 
+    <Button
+        android:id="@+id/addToCartButton"
+        android:text="Add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 
 
 </LinearLayout>
