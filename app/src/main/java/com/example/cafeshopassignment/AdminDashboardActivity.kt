@@ -22,12 +22,12 @@ class AdminDashboardActivity : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
 
         val welcomeText = findViewById<TextView>(R.id.adminWelcomeText)
-        val logoutButton = findViewById<Button>(R.id.adminLoginButton)
+        val logoutButton = findViewById<Button>(R.id.adminLogoutButton)
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val uid = currentUser.uid
 
-            // Fetch admin name from Firestore
+
             db.collection("users").document(uid)
                 .get()
                 .addOnSuccessListener { document ->

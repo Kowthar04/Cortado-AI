@@ -17,7 +17,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        auth = FirebaseAuth.getInstance() // initialize Firebase Authentication
+        auth = FirebaseAuth.getInstance()
 
         val emailInput = findViewById<EditText>(R.id.editTextUserName)
         val passwordInput = findViewById<EditText>(R.id.editTextPassword)
@@ -38,16 +38,16 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Firebase Login
+
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        // Log and redirect safely on the main thread
+
                         Log.d("LoginActivity", "Login successful, redirecting to MenuActivity")
                         runOnUiThread {
                             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
                             startActivity(Intent(this, MenuActivity::class.java))
-                            finish() // closes login so user can't go back
+                            finish() //
                         }
                     } else {
                         Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
@@ -55,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
         registerRedirect.setOnClickListener {
-            // Navigates to RegisterActivity so user can register
+
             startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
