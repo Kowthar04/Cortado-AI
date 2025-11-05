@@ -2,6 +2,7 @@ package com.example.cafeshopassignment
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -25,6 +26,12 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
+
+
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
@@ -34,10 +41,11 @@ class MenuActivity : AppCompatActivity() {
         menuRecyclerView = findViewById(R.id.menuRecyclerView)
         menuRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // ✅ Create adapter
         menuAdapter = MenuAdapter(emptyList()) { menuItem ->
+            CartManager.addItem(menuItem)
             Toast.makeText(this, "${menuItem.name} added to cart!", Toast.LENGTH_SHORT).show()
         }
+
         menuRecyclerView.adapter = menuAdapter
 
         val categories = listOf("Drinks", "Breakfast", "Lunch", "Pastries & Sweets")
@@ -70,6 +78,24 @@ class MenuActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_activity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_cart -> {
+                Toast.makeText(this, "Cart clicked!", Toast.LENGTH_SHORT).show() // test
+                startActivity(Intent(this, CartActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+
+
     private fun loadMenuItems(category: String) {
         db.collection("menuItems")
             .whereEqualTo("category", category)
@@ -77,14 +103,23 @@ class MenuActivity : AppCompatActivity() {
             .addOnSuccessListener { documents ->
 
                 val menuList = documents.map { doc ->
+
+                    val priceAny = doc.get("price")
+                    val price = when (priceAny) {
+                        is Number -> priceAny.toDouble()
+                        is String -> priceAny.toDoubleOrNull() ?: 0.0
+                        else -> 0.0
+                    }
+
                     MenuItem(
                         id = doc.id,
                         name = doc.getString("name") ?: "",
                         category = doc.getString("category") ?: "",
-                        price = doc.getDouble("price") ?: 0.0,
+                        price = price,
                         active = doc.getBoolean("active") ?: true
                     )
                 }
+
 
                 menuAdapter.updateData(menuList)
 
