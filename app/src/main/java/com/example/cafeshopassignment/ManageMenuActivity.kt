@@ -36,7 +36,6 @@ class ManageMenuActivity : AppCompatActivity() {
 
         loadMenuItems()
     }
-
     private fun loadMenuItems() {
         db.collection("menuItems")
             .get()
@@ -67,17 +66,31 @@ class ManageMenuActivity : AppCompatActivity() {
                 val price = priceInput.text.toString().toDoubleOrNull() ?: 0.0
                 val category = categoryInput.text.toString()
 
-                val newItem = MenuItem(name = name, price = price, category = category)
-                db.collection("menuItems").add(newItem)
+                if (name.isEmpty() || category.isEmpty()) {
+                    Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val docRef = db.collection("menuItems").document()
+                val newItem = MenuItem(
+                    id = docRef.id,
+                    name = name,
+                    price = price,
+                    category = category
+                )
+
+                docRef.set(newItem)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Item added!", Toast.LENGTH_SHORT).show()
                         loadMenuItems()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Error adding item", Toast.LENGTH_SHORT).show()
                     }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
-
     private fun editItem(item: MenuItem) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_item, null)
         val nameInput = dialogView.findViewById<EditText>(R.id.itemNameInput)
