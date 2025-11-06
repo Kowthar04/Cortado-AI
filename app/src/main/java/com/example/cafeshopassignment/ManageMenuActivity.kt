@@ -37,6 +37,7 @@ class ManageMenuActivity : AppCompatActivity() {
 
         loadMenuItems()
     }
+
     private fun loadMenuItems() {
         db.collection("menuItems")
             .get()
@@ -63,35 +64,37 @@ class ManageMenuActivity : AppCompatActivity() {
             .setTitle("Add Menu Item")
             .setView(dialogView)
             .setPositiveButton("Add") { _, _ ->
-                val name = nameInput.text.toString()
-                val price = priceInput.text.toString().toDoubleOrNull() ?: 0.0
-                val category = categoryInput.text.toString()
+                val name = nameInput.text.toString().trim()
+                val price = priceInput.text.toString().toDoubleOrNull()
+                val category = categoryInput.text.toString().trim()
 
-                if (name.isEmpty() || category.isEmpty()) {
-                    Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                if (name.isEmpty() || category.isEmpty() && price == null) {
+                    Toast.makeText(this, "Please fill in all fields correctly", Toast.LENGTH_SHORT)
+                        .show()
                     return@setPositiveButton
                 }
 
-                val docRef = db.collection("menuItems").document()
                 val newItem = MenuItem(
-                    id = docRef.id,
                     name = name,
                     price = price,
                     category = category
                 )
-
-                docRef.set(newItem)
+                db.collection("menuItems")
+                    .add(newItem)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Item added!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Item added Successfully!", Toast.LENGTH_SHORT).show()
                         loadMenuItems()
+
                     }
-                    .addOnFailureListener {
-                        Toast.makeText(this, "Error adding item", Toast.LENGTH_SHORT).show()
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error adding item : ${e.message}", Toast.LENGTH_SHORT)
+                            .show()
                     }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
+
     private fun editItem(item: MenuItem) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_item, null)
         val nameInput = dialogView.findViewById<EditText>(R.id.itemNameInput)
@@ -107,26 +110,52 @@ class ManageMenuActivity : AppCompatActivity() {
             .setView(dialogView)
             .setPositiveButton("Save") { _, _ ->
                 val updatedItem = mapOf(
-                    "name" to nameInput.text.toString(),
-                    "price" to priceInput.text.toString().toDouble(),
-                    "category" to categoryInput.text.toString()
+                    "name" to nameInput.text.toString().trim(),
+                    "price" to priceInput.text.toString().toDoubleOrNull(),
+                    "category" to categoryInput.text.toString().trim(),
                 )
-
-                db.collection("menuItems").document(item.id).update(updatedItem)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Item updated!", Toast.LENGTH_SHORT).show()
-                        loadMenuItems()
-                    }
+                val itemId = item.id
+                if (itemId != null) {
+                    db.collection("menuItems").document(itemId).update(updatedItem)
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "Item updated successfully!", Toast.LENGTH_SHORT)
+                                .show()
+                            loadMenuItems()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(this, "Update failed: ${e.message}", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                } else {
+                    Toast.makeText(this, "Missing item ID", Toast.LENGTH_SHORT).show()
+                }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
     private fun deleteItem(item: MenuItem) {
-        db.collection("menuItems").document(item.id).delete()
+        val itemId = item.id
+        if (itemId == null) {
+            Toast.makeText(this, "Error: Missing item ID", Toast.LENGTH_SHORT).show()
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Delete Item")
+            .setMessage("Are you sure you want to delete ${item.name}?")
+            .setPositiveButton("Yes") { _, _ ->
+
+            }
+        db.collection("menuItems").document(itemId).delete()
             .addOnSuccessListener {
-                Toast.makeText(this, "Item deleted!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Item deleted Successfully!", Toast.LENGTH_SHORT).show()
                 loadMenuItems()
             }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error deleting item: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
+
 }
+
+
