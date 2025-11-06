@@ -15,9 +15,9 @@ object CartManager {
         } else {
             cartList.add(
                 CartItem(
-                    id = item.id,
+                    id = item.id ?: "",
                     name = item.name,
-                    price = item.price,
+                    price = item.price ?: 0.00,
                     quantity = 1
                 )
             )
