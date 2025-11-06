@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Primary Coffee Colors -->
+    <color name="coffee_brown">#8B4513</color>
+    <color name="dark_coffee">#6D4C41</color>
+    <color name="light_coffee">#A0522D</color>
+    <color name="coffee_cream">#F5E6D3</color>
+    <color name="coffee_beige">#F5F1ED</color>
+
+    <!-- Accent Deep Red -->
+    <color name="deep_red">#9E2B4A</color>
+    <color name="dark_red">#7D1F35</color>
+    <color name="light_red">#C44569</color>
+
+    <!-- Neutral Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="light_gray">#E0E0E0</color>
+    <color name="medium_gray">#A1887F</color>
+    <color name="dark_gray">#8D6E63</color>
+
+    <!-- Success Color -->
+    <color name="success_green">#4CAF50</color>
 </resources>

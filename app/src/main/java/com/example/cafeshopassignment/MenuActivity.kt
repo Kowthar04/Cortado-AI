@@ -67,7 +67,7 @@ class MenuActivity : AppCompatActivity() {
             val uid = currentUser.uid
             db.collection("users").document(uid).get()
                 .addOnSuccessListener { document ->
-                    welcomeText.text = "Welcome, ${document.getString("firstName")}!"
+                    welcomeText.text = "Welcome, ${document.getString("firstname")}!"
                 }
         }
 
