@@ -116,7 +116,7 @@ class MenuActivity : AppCompatActivity() {
                         name = doc.getString("name") ?: "",
                         category = doc.getString("category") ?: "",
                         price = price,
-                        active = doc.getBoolean("active") ?: true
+                        availability = doc.getBoolean("available") ?: true
                     )
                 }
 
