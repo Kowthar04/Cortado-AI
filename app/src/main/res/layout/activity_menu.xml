@@ -5,64 +5,107 @@
     android:id="@+id/menuLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="32dp"
-    android:background="#FFFFFF">
+    android:background="#F5F1ED">
+
+
+    <View
+        android:id="@+id/headerBackground"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:background="@drawable/coffee_header_gradient"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@android:color/transparent"
+        android:elevation="0dp"
         app:title=""
-        app:titleTextColor="@android:color/white"
+        app:titleTextColor="#FFFFFF"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <ImageView
+        android:id="@+id/coffeeLogo"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_coffee_cup"
+        android:contentDescription="Coffee Cup"
+        app:tint="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
 
     <TextView
         android:id="@+id/welcomeText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Welcome to the Coffee Menu!"
-        android:textSize="22sp"
+        android:text="Welcome to Coffee and Co..."
+        android:textSize="24sp"
         android:textStyle="bold"
+        android:textColor="#FFFFFF"
         android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
+        android:fontFamily="serif"
+        android:shadowColor="#80000000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="3"
+        app:layout_constraintTop_toBottomOf="@id/coffeeLogo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/categoryTabs"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:tabIndicatorColor="@android:color/black"
-        app:tabSelectedTextColor="@android:color/black"
-        app:tabTextColor="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/welcomeText"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        app:tabIndicatorColor="#8B4513"
+        app:tabIndicatorHeight="3dp"
+        app:tabSelectedTextColor="#8B4513"
+        app:tabTextColor="#6D4C41"
+        app:tabMode="scrollable"
+        app:tabTextAppearance="@style/TabTextStyle"
+        app:layout_constraintTop_toBottomOf="@id/headerBackground"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginTop="-20dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/menuRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="8dp"
+        android:padding="16dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/categoryTabs"
         app:layout_constraintBottom_toTopOf="@id/logoutButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
 
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:text="Logout"
-        android:backgroundTint="#9E2B4A"
         android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:backgroundTint="#9E2B4A"
+        android:elevation="4dp"
+        app:cornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
