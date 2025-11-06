@@ -47,7 +47,8 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.manageMenuCard)
             .setOnClickListener {
-                Toast.makeText(this, "Manage Menu clicked", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, ManageMenuActivity::class.java)
+                startActivity(intent)
             }
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.viewOrdersCard)
             .setOnClickListener {
