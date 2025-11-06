@@ -47,6 +47,9 @@
             android:name=".ManageMenuActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".ViewOrdersActivity"
+            android:exported="true" />
 
 
     </application>

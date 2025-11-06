@@ -1,0 +1,110 @@
+package com.example.cafeshopassignment
+
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.cafeshopassignment.adapters.AdminOrderAdapter
+import com.example.cafeshopassignment.models.Order
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
+class ViewOrdersActivity : AppCompatActivity() {
+
+    private lateinit var db: FirebaseFirestore
+    private lateinit var adapter: AdminOrderAdapter
+    private val orderList = mutableListOf<Order>()
+    private val auth = FirebaseAuth.getInstance()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_view_orders)
+
+        db = FirebaseFirestore.getInstance()
+        val recyclerView = findViewById<RecyclerView>(R.id.ordersRecyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        adapter = AdminOrderAdapter(orderList) { order ->
+            showStatusDialog(order)
+        }
+        recyclerView.adapter = adapter
+
+        loadUserRoleAndOrders()
+    }
+
+
+    private fun loadUserRoleAndOrders() {
+        val uid = auth.currentUser?.uid ?: return
+        val userRef = db.collection("users").document(uid)
+
+        userRef.get().addOnSuccessListener { doc ->
+            val role = doc.getString("role")
+
+            if (role == "admin") {
+                loadAllOrders()
+            } else {
+                loadUserOrders(uid)
+            }
+
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to load user role: ${it.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    private fun loadAllOrders() {
+        db.collection("orders")
+            .get()
+            .addOnSuccessListener { result ->
+                orderList.clear()
+                for (doc in result) {
+                    val order = doc.toObject(Order::class.java).copy(id = doc.id)
+                    orderList.add(order)
+                }
+                adapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load orders: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+    private fun loadUserOrders(uid: String) {
+        db.collection("orders")
+            .whereEqualTo("userId", uid)
+            .get()
+            .addOnSuccessListener { result ->
+                orderList.clear()
+                for (doc in result) {
+                    val order = doc.toObject(Order::class.java).copy(id = doc.id)
+                    orderList.add(order)
+                }
+                adapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load your orders: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+    private fun showStatusDialog(order: Order) {
+        val statuses = arrayOf("Pending", "Preparing", "Ready for Collection", "Completed")
+        AlertDialog.Builder(this)
+            .setTitle("Update Order Status")
+            .setItems(statuses) { _, which ->
+                val selected = statuses[which]
+                db.collection("orders").document(order.id)
+                    .update("status", selected)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Status updated to $selected", Toast.LENGTH_SHORT).show()
+                        loadUserRoleAndOrders()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Failed to update status", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .show()
+    }
+}

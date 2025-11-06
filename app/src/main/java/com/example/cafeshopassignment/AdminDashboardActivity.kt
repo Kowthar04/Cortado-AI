@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.cafeshopassignment.ViewOrdersActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -52,7 +53,8 @@ class AdminDashboardActivity : AppCompatActivity() {
             }
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.viewOrdersCard)
             .setOnClickListener {
-                Toast.makeText(this, "View Orders clicked", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, ViewOrdersActivity::class.java)
+               startActivity(intent)
             }
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.feedbackCard)
             .setOnClickListener {

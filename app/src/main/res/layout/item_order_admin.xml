@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_marginBottom="10dp"
+    android:background="#EDEBDD"
+    android:elevation="2dp">
+
+    <TextView
+        android:id="@+id/customerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Customer: John Smith"
+        android:textStyle="bold"
+        android:textColor="#1B1717"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/orderStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status: Pending"
+        android:textColor="#810100"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/orderTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total: £7.00"
+        android:layout_marginTop="4dp"/>
+
+    <Button
+        android:id="@+id/updateStatusButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update Status"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#810100"
+        android:layout_marginTop="8dp" />
+</LinearLayout>
