@@ -30,6 +30,14 @@ class PaymentActivity : AppCompatActivity() {
 
     private var totalAmount: Double = 0.0
 
+    private lateinit var promoCodeInput: EditText
+    private lateinit var applyPromoButton: Button
+
+    private var discountAmount = 0.0
+    private var finalTotal = 0.0
+    private val serviceFee = 0.50
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_payment)
@@ -38,6 +46,16 @@ class PaymentActivity : AppCompatActivity() {
 
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+
+        promoCodeInput = findViewById(R.id.promoCodeInput)
+        applyPromoButton = findViewById(R.id.applyPromoButton)
+
+        finalTotal = totalAmount + serviceFee
+
+        applyPromoButton.setOnClickListener {
+            val code = promoCodeInput.text.toString().trim().uppercase()
+            applyPromoCode(code)
+        }
 
 
         totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
@@ -96,7 +114,33 @@ class PaymentActivity : AppCompatActivity() {
         payNowButton.setOnClickListener {
             processPayment(finalTotal)
         }
+
+
+
     }
+
+    private fun applyPromoCode(code: String) {
+        if (code.isEmpty()) {
+            Toast.makeText(this, "Enter promo code first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (code == "THIRSTY") {
+            discountAmount = (totalAmount + serviceFee) * 0.20   // 20% off
+            finalTotal = (totalAmount + serviceFee) - discountAmount
+
+            // Prevent negative totals
+            if (finalTotal < 0) finalTotal = 0.0
+
+            val totalText = findViewById<TextView>(R.id.totalAmount)
+            totalText.text = "£${"%.2f".format(finalTotal)}"
+
+            Toast.makeText(this, "Promo code applied: 20% off!", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Invalid promo code", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     private fun selectPaymentMethod(method: String) {
         when (method) {

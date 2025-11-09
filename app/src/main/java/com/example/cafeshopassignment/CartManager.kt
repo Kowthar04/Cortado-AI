@@ -7,6 +7,8 @@ object CartManager {
 
     private val cartList = mutableListOf<CartItem>()
 
+
+
     fun addItem(item: MenuItem) {
         val exists = cartList.find { it.id == item.id }
 

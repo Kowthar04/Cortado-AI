@@ -427,5 +427,41 @@
                 android:layout_marginStart="8dp"/>
         </LinearLayout>
 
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="3dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <EditText
+                    android:id="@+id/promoCodeInput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Enter promo code"
+                    android:background="@android:color/transparent"
+                    android:textColor="#6D4C41"
+                    android:textColorHint="#A1887F"/>
+
+                <Button
+                    android:id="@+id/applyPromoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Apply"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#9E2B4A"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
     </LinearLayout>
 </ScrollView>
