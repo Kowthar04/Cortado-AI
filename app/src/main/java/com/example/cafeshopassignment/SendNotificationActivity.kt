@@ -26,7 +26,7 @@ class SendNotificationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_send_notification)
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.adminToolbar)
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.sendNotificationToolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)

@@ -119,9 +119,7 @@ class PaymentActivity : AppCompatActivity() {
             return
         }
 
-
         if (cardPaymentRadio.isChecked) {
-
             if (!validateCardDetails()) {
                 return
             }
@@ -130,45 +128,58 @@ class PaymentActivity : AppCompatActivity() {
             return
         }
 
-
         Toast.makeText(this, "Processing payment...", Toast.LENGTH_SHORT).show()
 
+        val userId = currentUser.uid
 
-        val cartItems = CartManager.getCart()
-        val orderData = hashMapOf(
-            "userId" to currentUser.uid,
-            "items" to cartItems.map {
-                mapOf(
-                    "name" to it.name,
-                    "quantity" to it.quantity,
-                    "price" to it.price
+
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { doc ->
+                val customerName = doc.getString("firstname")
+                    ?: doc.getString("firstName")
+                    ?: "Customer"
+
+                val cartItems = CartManager.getCart()
+
+
+                val orderData = hashMapOf(
+                    "userId" to userId,
+                    "customerName" to customerName,
+                    "items" to cartItems.map {
+                        mapOf(
+                            "name" to it.name,
+                            "quantity" to it.quantity,
+                            "price" to it.price
+                        )
+                    },
+                    "subtotal" to totalAmount,
+                    "serviceFee" to 0.50,
+                    "totalPrice" to amount,
+                    "paymentMethod" to getSelectedPaymentMethod(),
+                    "status" to "Pending",
+                    "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
+                    "paymentStatus" to "Completed"
                 )
-            },
-            "subtotal" to totalAmount,
-            "serviceFee" to 0.50,
-            "total" to amount,
-            "paymentMethod" to getSelectedPaymentMethod(),
-            "status" to "Preparing",
-            "timestamp" to Date(),
-            "paymentStatus" to "Completed"
-        )
 
-        db.collection("orders").add(orderData)
-            .addOnSuccessListener {
+                db.collection("orders").add(orderData)
+                    .addOnSuccessListener {
+                        CartManager.clear()
 
-                CartManager.clear()
-
-
-                val intent = Intent(this, OrderConfirmationActivity::class.java)
-                intent.putExtra("ORDER_TOTAL", amount)
-                intent.putExtra("ORDER_ID", it.id)
-                startActivity(intent)
-                finish()
+                        val intent = Intent(this, OrderConfirmationActivity::class.java)
+                        intent.putExtra("ORDER_TOTAL", amount)
+                        intent.putExtra("ORDER_ID", it.id)
+                        startActivity(intent)
+                        finish()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Payment failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Payment failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to load user info: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun validateCardDetails(): Boolean {
         val cardNumber = cardNumberInput.text.toString().trim()

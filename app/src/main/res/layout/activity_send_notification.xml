@@ -1,54 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F5F1ED"
     android:orientation="vertical"
     android:padding="16dp">
 
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/adminToolbar"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="#810100"/>
-
     <!-- Toolbar -->
-    <EditText
-        android:id="@+id/notificationTitleInput"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/sendNotificationToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#810100"
+        app:title="Send Notification"
+        app:titleTextColor="@android:color/white" />
+
+    <!-- Card Container -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Notification Title" />
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:padding="20dp"
+        android:backgroundTint="#FFFFFF"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="6dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/notificationMessageInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Message"
-        android:layout_marginTop="8dp" />
+            <!-- Notification Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notification Title"
+                android:textColor="#4A2C2A"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
 
-    <EditText
-        android:id="@+id/notificationRecipientInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Recipient User ID"
-        android:layout_marginTop="8dp" />
+            <EditText
+                android:id="@+id/notificationTitleInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter title..."
+                android:padding="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/input_background"
+                android:textColor="#4A2C2A"
+                android:textColorHint="#A1887F" />
 
+            <!-- Notification Message -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Message"
+                android:textColor="#4A2C2A"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
 
-        <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/sendToAllSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send to All Users"
-        android:layout_marginTop="8dp" />
+            <EditText
+                android:id="@+id/notificationMessageInput"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:hint="Write your message here..."
+                android:padding="12dp"
+                android:gravity="top"
+                android:background="@drawable/input_background"
+                android:textColor="#4A2C2A"
+                android:textColorHint="#A1887F"
+                android:layout_marginBottom="12dp" />
 
-    <Button
-        android:id="@+id/sendNotificationButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Send Notification"
-        android:backgroundTint="#810100"
-        android:textColor="@android:color/white"
-        android:layout_marginTop="12dp" />
+            <!-- Recipient -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recipient User ID"
+                android:textColor="#4A2C2A"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <EditText
+                android:id="@+id/notificationRecipientInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter specific user ID (optional)"
+                android:padding="12dp"
+                android:background="@drawable/input_background"
+                android:textColor="#4A2C2A"
+                android:textColorHint="#A1887F"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Switch -->
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/sendToAllSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send to All Users"
+                android:textColor="#4A2C2A"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Send Button -->
+            <Button
+                android:id="@+id/sendNotificationButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Send Notification"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#810100"
+                android:elevation="4dp"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>
