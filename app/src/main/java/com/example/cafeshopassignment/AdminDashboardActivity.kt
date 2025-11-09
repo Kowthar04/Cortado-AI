@@ -56,10 +56,13 @@ class AdminDashboardActivity : AppCompatActivity() {
                 val intent = Intent(this, ViewOrdersActivity::class.java)
                startActivity(intent)
             }
+
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.feedbackCard)
             .setOnClickListener {
-                Toast.makeText(this, "View Feedback clicked", Toast.LENGTH_SHORT).show()
+                intent = Intent(this, ViewReviewsActivity::class.java)
+        startActivity(intent)
             }
+
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.notificationCard)
             .setOnClickListener {
                 Toast.makeText(this, "View Notifications clicked", Toast.LENGTH_SHORT).show()
