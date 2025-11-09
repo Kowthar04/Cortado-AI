@@ -30,9 +30,6 @@ class CartActivity : AppCompatActivity() {
         val recycler = findViewById<RecyclerView>(R.id.cartRecyclerView)
         val totalText = findViewById<TextView>(R.id.cartTotal)
         val placeOrderButton = findViewById<Button>(R.id.placeOrderButton)
-        val cartContentLayout = findViewById<View>(R.id.cartContentLayout)
-        val orderConfirmedLayout = findViewById<View>(R.id.orderConfirmedLayout)
-        val backToMenuButton = findViewById<Button>(R.id.backToMenuButton)
 
         fun updateTotal() {
             totalText.text = "Total: £${"%.2f".format(CartManager.getTotal())}"
@@ -56,39 +53,12 @@ class CartActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val orderData = hashMapOf(
-                "userId" to currentUser.uid,
-                "items" to cartItems.map {
-                    mapOf(
-                        "name" to it.name,
-                        "quantity" to it.quantity,
-                        "price" to it.price
-                    )
-                },
-                "total" to CartManager.getTotal(),
-                "status" to "Preparing",
-                "timestamp" to Date()
-            )
-
-            db.collection("orders").add(orderData)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Order placed successfully!", Toast.LENGTH_SHORT).show()
-                    CartManager.clear()
-
-                    // Hide cart layout and show confirmation
-                    cartContentLayout.visibility = View.GONE
-                    orderConfirmedLayout.visibility = View.VISIBLE
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Failed to place order: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
-
-        backToMenuButton.setOnClickListener {
-            val intent = Intent(this, MenuActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            val intent = Intent(this, PaymentActivity::class.java)
+            intent.putExtra("TOTAL_AMOUNT", CartManager.getTotal())
             startActivity(intent)
-            finish()
         }
     }
 }
+
+
+
