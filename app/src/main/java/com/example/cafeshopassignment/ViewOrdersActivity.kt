@@ -60,7 +60,8 @@ class ViewOrdersActivity : AppCompatActivity() {
             }
 
         }.addOnFailureListener {
-            Toast.makeText(this, "Failed to load user role: ${it.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Failed to load user role: ${it.message}", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -79,7 +80,8 @@ class ViewOrdersActivity : AppCompatActivity() {
                 Toast.makeText(this, "Loaded ${orderList.size} orders", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Failed to load orders: ${it.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to load orders: ${it.message}", Toast.LENGTH_SHORT)
+                    .show()
             }
     }
 
@@ -97,7 +99,11 @@ class ViewOrdersActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Failed to load your orders: ${it.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Failed to load your orders: ${it.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
@@ -108,14 +114,42 @@ class ViewOrdersActivity : AppCompatActivity() {
             .setTitle("Update Order Status")
             .setItems(statuses) { _, which ->
                 val selected = statuses[which]
+
                 db.collection("orders").document(order.id)
                     .update("status", selected)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Status updated to $selected", Toast.LENGTH_SHORT).show()
-                        loadUserRoleAndOrders()
+                        // ✅ Notification creation moved INSIDE this block
+                        val notificationData = hashMapOf(
+                            "recipientId" to order.userId,  // must exist in Order model
+                            "title" to "Order Status Update",
+                            "message" to "Your order is now $selected ☕",
+                            "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
+                            "isRead" to false
+                        )
+
+                        db.collection("notifications").add(notificationData)
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    this,
+                                    "Notification sent to user",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(
+                                    this,
+                                    "Failed to send notification: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        Toast.makeText(this, "Status updated to $selected", Toast.LENGTH_SHORT)
+                            .show()
+                        loadAllOrders()
                     }
                     .addOnFailureListener {
-                        Toast.makeText(this, "Failed to update status", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Failed to update order status", Toast.LENGTH_SHORT)
+                            .show()
                     }
             }
             .show()
