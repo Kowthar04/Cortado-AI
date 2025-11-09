@@ -29,16 +29,18 @@ class AdminDashboardActivity : AppCompatActivity() {
         val welcomeText = findViewById<TextView>(R.id.adminWelcomeText)
         val logoutButton = findViewById<Button>(R.id.AdminLogoutButton)
 
-        // 🧾 Load admin name
+
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val uid = currentUser.uid
-
             db.collection("users").document(uid)
                 .get()
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
-                        val firstName = document.getString("firstName") ?: "Admin"
+
+                        val firstName = document.getString("firstname")
+                            ?: document.getString("firstName")
+                            ?: "Admin"
                         welcomeText.text = "Welcome, $firstName!"
                     } else {
                         welcomeText.text = "Welcome, Admin!"
@@ -52,7 +54,7 @@ class AdminDashboardActivity : AppCompatActivity() {
             welcomeText.text = "Welcome!"
         }
 
-        // 🧩 CARD NAVIGATION
+
         findViewById<androidx.cardview.widget.CardView>(R.id.cardManageMenu)
             .setOnClickListener {
                 startActivity(Intent(this, ManageMenuActivity::class.java))
@@ -73,24 +75,27 @@ class AdminDashboardActivity : AppCompatActivity() {
                 startActivity(Intent(this, ViewOrdersActivity::class.java))
             }
 
-        // 🚀 Load recent orders with color-coded status badges
+
         loadRecentOrders()
 
-        // 🚪 Logout button
+
         logoutButton.setOnClickListener {
             auth.signOut()
             Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
             finish()
         }
     }
 
-    // 🧾 Load latest 3–4 orders dynamically with color-coded badges
+
     private fun loadRecentOrders() {
         val container = findViewById<LinearLayout>(R.id.ordersPreviewContainer)
         container.removeAllViews()
 
         db.collection("orders")
-            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .limit(4)
             .get()
             .addOnSuccessListener { result ->
@@ -109,14 +114,12 @@ class AdminDashboardActivity : AppCompatActivity() {
                     val status = doc.getString("status") ?: "Pending"
                     val total = doc.getDouble("totalPrice") ?: 0.0
 
-                    // Create container for each order row
                     val orderRow = LinearLayout(this).apply {
                         orientation = LinearLayout.HORIZONTAL
                         setPadding(8, 8, 8, 8)
                         gravity = Gravity.CENTER_VERTICAL
                     }
 
-                    // Customer + total text
                     val orderInfo = TextView(this).apply {
                         text = "• $customer  -  £${"%.2f".format(total)}"
                         setTextColor(Color.parseColor("#4A2C2A"))
@@ -128,7 +131,6 @@ class AdminDashboardActivity : AppCompatActivity() {
                         )
                     }
 
-                    // Status badge
                     val badge = TextView(this).apply {
                         text = status
                         textSize = 12f
