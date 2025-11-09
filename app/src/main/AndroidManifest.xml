@@ -55,6 +55,13 @@
             android:name=".ViewReviewsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".SendNotificationActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".NotificationInboxActivity"
+            android:exported="false" />
 
     </application>
 

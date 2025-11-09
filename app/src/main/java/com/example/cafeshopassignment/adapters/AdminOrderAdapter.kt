@@ -15,7 +15,7 @@ class AdminOrderAdapter(
 ) : RecyclerView.Adapter<AdminOrderAdapter.OrderViewHolder>() {
 
     inner class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val customerName: TextView = view.findViewById(R.id.customerName)
+        val userIdText: TextView = view.findViewById(R.id.userIdText)
         val orderStatus: TextView = view.findViewById(R.id.orderStatus)
         val orderTotal: TextView = view.findViewById(R.id.orderTotal)
         val updateButton: Button = view.findViewById(R.id.updateStatusButton)
@@ -29,13 +29,14 @@ class AdminOrderAdapter(
 
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
         val order = orders[position]
-        holder.customerName.text = "Customer: ${order.customerName}"
-        holder.orderStatus.text = "Status: ${order.status ?: "Pending"}"
-        holder.orderTotal.text = "Total: £${order.totalPrice ?: 0.0}"
+
+        holder.userIdText.text = "User ID: ${order.userId}"
+        holder.orderStatus.text = "Status: ${order.status}"
+        holder.orderTotal.text = "Total: £${String.format("%.2f", order.total)}"
+
         holder.updateButton.setOnClickListener { onUpdateStatus(order) }
     }
 
     override fun getItemCount(): Int = orders.size
 }
-
 

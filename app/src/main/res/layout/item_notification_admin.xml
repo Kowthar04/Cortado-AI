@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#FFF8F8"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/notificationTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Offer!"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#810100" />
+
+    <TextView
+        android:id="@+id/notificationMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20% off on all pastries today!"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"
+        android:textColor="#000" />
+
+    <TextView
+        android:id="@+id/notificationDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="09 Nov 2025, 11:30 AM"
+        android:textSize="14sp"
+        android:textColor="#555"
+        android:layout_marginTop="4dp" />
+</LinearLayout>

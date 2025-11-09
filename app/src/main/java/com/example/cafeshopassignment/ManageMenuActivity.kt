@@ -23,6 +23,17 @@ class ManageMenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manage_menu)
 
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.adminToolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        toolbar.setNavigationOnClickListener {
+            finish()
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+
+        }
+
         db = FirebaseFirestore.getInstance()
 
         recyclerView = findViewById<RecyclerView>(R.id.menuRecyclerView)

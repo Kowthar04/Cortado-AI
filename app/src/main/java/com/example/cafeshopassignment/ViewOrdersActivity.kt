@@ -22,6 +22,17 @@ class ViewOrdersActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_orders)
 
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.adminToolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        toolbar.setNavigationOnClickListener {
+            finish()
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+
+        }
+
         db = FirebaseFirestore.getInstance()
         val recyclerView = findViewById<RecyclerView>(R.id.ordersRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -56,6 +67,7 @@ class ViewOrdersActivity : AppCompatActivity() {
 
     private fun loadAllOrders() {
         db.collection("orders")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 orderList.clear()
@@ -64,6 +76,7 @@ class ViewOrdersActivity : AppCompatActivity() {
                     orderList.add(order)
                 }
                 adapter.notifyDataSetChanged()
+                Toast.makeText(this, "Loaded ${orderList.size} orders", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to load orders: ${it.message}", Toast.LENGTH_SHORT).show()

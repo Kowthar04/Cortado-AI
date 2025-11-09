@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/adminToolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#810100"/>
+
+    <!-- Toolbar -->
+    <EditText
+        android:id="@+id/notificationTitleInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Notification Title" />
+
+
+    <EditText
+        android:id="@+id/notificationMessageInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Message"
+        android:layout_marginTop="8dp" />
+
+    <EditText
+        android:id="@+id/notificationRecipientInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Recipient User ID"
+        android:layout_marginTop="8dp" />
+
+
+        <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/sendToAllSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send to All Users"
+        android:layout_marginTop="8dp" />
+
+    <Button
+        android:id="@+id/sendNotificationButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Notification"
+        android:backgroundTint="#810100"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="12dp" />
+
+</LinearLayout>

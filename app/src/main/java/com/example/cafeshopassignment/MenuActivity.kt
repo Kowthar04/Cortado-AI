@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +39,10 @@ class MenuActivity : AppCompatActivity() {
         val welcomeText = findViewById<TextView>(R.id.welcomeText)
         val logoutButton = findViewById<Button>(R.id.logoutButton)
         val categoryTabs = findViewById<TabLayout>(R.id.categoryTabs)
+        val mailButton = findViewById<ImageButton>(R.id.mailButton)
+        mailButton.setOnClickListener {
+            startActivity(Intent(this, NotificationInboxActivity::class.java))
+        }
         menuRecyclerView = findViewById(R.id.menuRecyclerView)
         menuRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -116,7 +121,7 @@ class MenuActivity : AppCompatActivity() {
                         name = doc.getString("name") ?: "",
                         category = doc.getString("category") ?: "",
                         price = price,
-                        availability = doc.getBoolean("available") ?: true
+                        availability = doc.getBoolean("availability") ?: true
                     )
                 }
 

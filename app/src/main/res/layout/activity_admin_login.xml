@@ -1,72 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/admin_login_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    tools:context=".AdminLoginActivity">
+    android:background="@drawable/login_background_gradient"
+    android:fillViewport="true">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/adminLoginTitle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Admin Login"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="60dp" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="32dp">
 
-    <!-- Admin Email -->
-    <EditText
-        android:id="@+id/adminEmailInput"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Admin Email"
-        android:inputType="textEmailAddress"
-        app:layout_constraintTop_toBottomOf="@id/adminLoginTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp" />
 
-    <!-- Admin Password -->
-    <EditText
-        android:id="@+id/adminPasswordInput"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        app:layout_constraintTop_toBottomOf="@id/adminEmailInput"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_coffee_beans"
+            app:tint="#6B3E2E"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="App logo" />
 
-    <!-- Login Button -->
-    <Button
-        android:id="@+id/adminLoginButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Login as Admin"
-        app:layout_constraintTop_toBottomOf="@id/adminPasswordInput"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
 
-    <!-- Back to User Login Button -->
-    <Button
-        android:id="@+id/backToUserLoginButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Back to User Login"
-        app:layout_constraintTop_toBottomOf="@id/adminLoginButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        <TextView
+            android:id="@+id/adminLoginTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Admin Login"
+            android:textColor="#4A2C2A"
+            android:textSize="28sp"
+            android:fontFamily="serif"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manage your Café with ease"
+            android:textColor="#7B5A4D"
+            android:textSize="14sp"
+            android:layout_marginBottom="28dp"/>
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/white"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@android:drawable/ic_dialog_email"
+                    app:tint="#810100"
+                    android:layout_marginEnd="8dp"/>
+
+                <EditText
+                    android:id="@+id/adminEmailInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Admin Email"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp"
+                    android:textColor="#3B2C28"
+                    android:textColorHint="#A1887F"
+                    android:inputType="textEmailAddress"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/white"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@android:drawable/ic_lock_lock"
+                    app:tint="#810100"
+                    android:layout_marginEnd="8dp"/>
+
+                <EditText
+                    android:id="@+id/adminPasswordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp"
+                    android:textColor="#3B2C28"
+                    android:textColorHint="#A1887F"
+                    android:inputType="textPassword"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <Button
+            android:id="@+id/adminLoginButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Login as Admin"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#810100"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="12dp"/>
+
+
+        <Button
+            android:id="@+id/backToUserLoginButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Back to User Login"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#4A2C2A"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"/>
+
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_coffee_steam"
+            app:tint="#D7CCC8"
+            android:alpha="0.3"
+            android:layout_marginTop="32dp"
+            android:contentDescription="Decorative steam"/>
+    </LinearLayout>
+</ScrollView>

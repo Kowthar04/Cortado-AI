@@ -19,6 +19,17 @@ class ViewReviewsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_reviews)
 
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.adminToolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        toolbar.setNavigationOnClickListener {
+            finish()
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+
+        }
+
         db = FirebaseFirestore.getInstance()
 
         val recyclerView = findViewById<RecyclerView>(R.id.reviewsRecyclerView)

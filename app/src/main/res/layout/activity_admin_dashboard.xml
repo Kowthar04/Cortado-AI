@@ -1,133 +1,215 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/adminDashboardLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="#F5F1ED"
     android:padding="16dp"
     tools:context=".AdminDashboardActivity">
 
-    <!-- Welcome Header -->
-    <TextView
-        android:id="@+id/adminWelcomeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome, Admin!"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="#990000"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="40dp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <!-- Manage Menu -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/manageMenuCard"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="40dp"
-        app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="#FFEBEE"
-        app:layout_constraintTop_toBottomOf="@id/adminWelcomeText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.9">
+        <!-- Header -->
+        <TextView
+            android:id="@+id/adminWelcomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome back, Admin!"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#4A2C2A"
+            android:layout_marginBottom="4dp"/>
 
         <TextView
+            android:id="@+id/dashboardSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Here’s your café overview ☕"
+            android:textSize="14sp"
+            android:textColor="#7B5A4D"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- Manage Menu Card (Full Width) -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardManageMenu"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Manage Menu"
-            android:gravity="center"
-            android:textColor="#990000"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </com.google.android.material.card.MaterialCardView>
+            android:layout_height="150dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp"
+            android:backgroundTint="#FFFFFF"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
-    <!-- View Orders -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/viewOrdersCard"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
-        app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="#FFEBEE"
-        app:layout_constraintTop_toBottomOf="@id/manageMenuCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.9">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
 
-        <TextView
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_coffee_cup"
+                    app:tint="#810100"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manage Menu"
+                    android:textColor="#4A2C2A"
+                    android:textStyle="bold"
+                    android:textSize="18sp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Row with Feedback + Notifications -->
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="View Orders"
-            android:gravity="center"
-            android:textColor="#990000"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </com.google.android.material.card.MaterialCardView>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:weightSum="2">
 
-    <!-- View Feedback -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/feedbackCard"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
-        app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="#FFEBEE"
-        app:layout_constraintTop_toBottomOf="@id/viewOrdersCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.9">
+            <!-- Feedback -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardViewFeedback"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                android:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground">
 
-        <TextView
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_check_circle"
+                        app:tint="#810100"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View Feedback"
+                        android:textColor="#4A2C2A"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Notifications -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardSendNotifications"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                android:backgroundTint="#FFFFFF"
+                android:layout_marginStart="8dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/baseline_mail_24"
+                        app:tint="#810100"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Send Notifications"
+                        android:textColor="#4A2C2A"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <!-- Recent Orders Section -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardRecentOrders"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="View Feedback"
-            android:gravity="center"
-            android:textColor="#990000"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </com.google.android.material.card.MaterialCardView>
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp"
+            android:backgroundTint="#FFFFFF"
+            android:layout_marginBottom="16dp">
 
-    <!-- Send Notifications -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/notificationCard"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
-        app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="#FFEBEE"
-        app:layout_constraintTop_toBottomOf="@id/feedbackCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.9">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
 
-        <TextView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recent Orders"
+                    android:textColor="#4A2C2A"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_marginBottom="8dp"/>
+
+                <!-- Order List -->
+                <LinearLayout
+                    android:id="@+id/ordersPreviewContainer"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="?android:attr/dividerHorizontal"
+                    android:showDividers="middle"/>
+
+                <Button
+                    android:id="@+id/viewMoreOrdersButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="View More Orders"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="#810100"
+                    android:textStyle="bold"
+                    android:layout_marginTop="12dp"
+                    app:cornerRadius="12dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/AdminLogoutButton"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Send Notifications"
-            android:gravity="center"
-            android:textColor="#990000"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </com.google.android.material.card.MaterialCardView>
+            android:layout_height="52dp"
+            android:text="Logout"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:backgroundTint="#4A2C2A"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="12dp"/>
 
-    <!-- Logout Button -->
-    <Button
-        android:id="@+id/adminLogoutButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:backgroundTint="#990000"
-        android:textColor="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/notificationCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="30dp"
-        app:layout_constraintWidth_percent="0.5" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</ScrollView>
