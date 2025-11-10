@@ -42,6 +42,10 @@
             android:name=".OrderConfirmationActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ReviewActivity"
+            android:exported="false" />
+
 
         <activity
             android:name=".AdminLoginActivity"
