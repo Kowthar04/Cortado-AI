@@ -22,6 +22,13 @@ class OrderConfirmationActivity : AppCompatActivity() {
         val orderAmountText = findViewById<TextView>(R.id.orderAmountText)
         val backToMenuButton = findViewById<Button>(R.id.backToMenuButton)
 
+        val leaveReviewButton = findViewById<Button>(R.id.leaveReviewButton)
+        leaveReviewButton.setOnClickListener {
+            val intent = Intent(this, ReviewActivity::class.java)
+            intent.putExtra("ORDER_ID", orderId)
+            startActivity(intent)
+        }
+
         orderIdText.text = "Order #${orderId.takeLast(8).uppercase()}"
         orderAmountText.text = "Total Paid: £${"%.2f".format(orderTotal)}"
 
