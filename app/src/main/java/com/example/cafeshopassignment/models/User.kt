@@ -2,7 +2,7 @@ package com.example.cafeshopassignment.models
 
 class User {
     val userid: String = ""
-    val name: String = ""
+    val firstname: String = ""
     val email: String = ""
     val role: String = "admin" // "admin" or "customer"
 

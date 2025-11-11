@@ -9,11 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.R
 import com.example.cafeshopassignment.models.MenuItem
 
-class AdminMenuAdapter (
+class AdminMenuAdapter(
     private val menuList: MutableList<MenuItem>,
     private val onEdit: (MenuItem) -> Unit,
     private val onDelete: (MenuItem) -> Unit
-
 ) : RecyclerView.Adapter<AdminMenuAdapter.MenuViewHolder>() {
 
     inner class MenuViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -32,11 +31,11 @@ class AdminMenuAdapter (
     override fun onBindViewHolder(holder: MenuViewHolder, position: Int) {
         val item = menuList[position]
         holder.name.text = item.name
-        holder.price.text = "£${item.price}"
+        holder.price.text = "£${"%.2f".format(item.price)}" // ✅ use totalPrice instead of price
+
         holder.editButton.setOnClickListener { onEdit(item) }
         holder.deleteButton.setOnClickListener { onDelete(item) }
     }
 
     override fun getItemCount() = menuList.size
-
 }

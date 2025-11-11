@@ -31,8 +31,6 @@ class MenuActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-
-
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
@@ -40,18 +38,19 @@ class MenuActivity : AppCompatActivity() {
         val logoutButton = findViewById<Button>(R.id.logoutButton)
         val categoryTabs = findViewById<TabLayout>(R.id.categoryTabs)
         val mailButton = findViewById<ImageButton>(R.id.mailButton)
+        val cartButton = findViewById<ImageButton>(R.id.cartButton)
 
-
-
+        // 📨 Notifications inbox
         mailButton.setOnClickListener {
             startActivity(Intent(this, NotificationInboxActivity::class.java))
         }
 
-        val cartButton = findViewById<ImageButton>(R.id.cartButton)
+        // 🛒 Open Cart
         cartButton.setOnClickListener {
             startActivity(Intent(this, CartActivity::class.java))
         }
 
+        // 🔽 Setup RecyclerView
         menuRecyclerView = findViewById(R.id.menuRecyclerView)
         menuRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -59,13 +58,13 @@ class MenuActivity : AppCompatActivity() {
             CartManager.addItem(menuItem)
             Toast.makeText(this, "${menuItem.name} added to cart!", Toast.LENGTH_SHORT).show()
         }
-
         menuRecyclerView.adapter = menuAdapter
 
+        // 🧭 Category tabs
         val categories = listOf("Drinks", "Breakfast", "Lunch", "Pastries & Sweets")
         categories.forEach { categoryTabs.addTab(categoryTabs.newTab().setText(it)) }
 
-        loadMenuItems(categories[0])
+        loadMenuItems(categories[0]) // default category
 
         categoryTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -76,15 +75,21 @@ class MenuActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
 
+        // 👋 Welcome message
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val uid = currentUser.uid
             db.collection("users").document(uid).get()
                 .addOnSuccessListener { document ->
-                    welcomeText.text = "Welcome, ${document.getString("firstname")}!"
+                    val firstName = document.getString("firstname") ?: "Customer"
+                    welcomeText.text = "Welcome, $firstName!"
+                }
+                .addOnFailureListener {
+                    welcomeText.text = "Welcome!"
                 }
         }
 
+        // 🚪 Logout
         logoutButton.setOnClickListener {
             auth.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
@@ -92,18 +97,15 @@ class MenuActivity : AppCompatActivity() {
         }
     }
 
-
-
-
+    // 🧾 Load menu items from Firestore
+    // 🧾 Load menu items from Firestore
     private fun loadMenuItems(category: String) {
         db.collection("menuItems")
             .whereEqualTo("category", category)
             .get()
             .addOnSuccessListener { documents ->
-
                 val menuList = documents.map { doc ->
-
-                    val priceAny = doc.get("price")
+                    val priceAny = doc.get("price") // ✅ now matches Firestore field name
                     val price = when (priceAny) {
                         is Number -> priceAny.toDouble()
                         is String -> priceAny.toDoubleOrNull() ?: 0.0
@@ -114,11 +116,10 @@ class MenuActivity : AppCompatActivity() {
                         id = doc.id,
                         name = doc.getString("name") ?: "",
                         category = doc.getString("category") ?: "",
-                        price = price,
+                        price = price, // ✅ use price
                         availability = doc.getBoolean("availability") ?: true
                     )
                 }
-
 
                 menuAdapter.updateData(menuList)
 
@@ -126,5 +127,9 @@ class MenuActivity : AppCompatActivity() {
                     Toast.makeText(this, "No items in $category", Toast.LENGTH_SHORT).show()
                 }
             }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to load menu: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 }
+

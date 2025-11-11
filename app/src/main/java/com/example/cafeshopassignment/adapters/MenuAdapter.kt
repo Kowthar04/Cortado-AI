@@ -11,7 +11,7 @@ import com.example.cafeshopassignment.models.MenuItem
 
 class MenuAdapter(
     private var menuList: List<MenuItem>,
-    private val onAddToCartClick: (MenuItem) -> Unit // ✅ Click callback
+    private val onAddToCartClick: (MenuItem) -> Unit
 ) : RecyclerView.Adapter<MenuAdapter.MenuViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {
@@ -25,8 +25,9 @@ class MenuAdapter(
         holder.itemName.text = item.name
         holder.itemPrice.text = "£${"%.2f".format(item.price)}"
 
+
         holder.addToCartButton.setOnClickListener {
-            onAddToCartClick(item) // ✅ Pass clicked item
+            onAddToCartClick(item)
         }
     }
 
@@ -43,4 +44,3 @@ class MenuAdapter(
         notifyDataSetChanged()
     }
 }
-

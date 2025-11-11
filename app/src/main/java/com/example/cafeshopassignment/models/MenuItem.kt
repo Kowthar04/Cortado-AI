@@ -5,7 +5,6 @@ data class MenuItem(
     val id: String? = null,
     val name: String = "",
     val category: String = "",
-    val price: Double? = 0.00,
+    val price: Double = 0.0,
     val availability: Boolean = true
-
 )

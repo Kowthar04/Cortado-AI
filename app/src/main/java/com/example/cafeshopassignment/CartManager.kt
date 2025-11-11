@@ -7,19 +7,19 @@ object CartManager {
 
     private val cartList = mutableListOf<CartItem>()
 
-
-
     fun addItem(item: MenuItem) {
-        val exists = cartList.find { it.id == item.id }
+        val itemId = item.id ?: "" // handle nullable id
+        val existing = cartList.find { it.id == itemId }
 
-        if (exists != null) {
-            exists.quantity++
+        if (existing != null) {
+            existing.quantity++
         } else {
             cartList.add(
                 CartItem(
-                    id = item.id ?: "",
+                    id = itemId,
                     name = item.name,
-                    price = item.price ?: 0.00,
+
+                    price = item.price,
                     quantity = 1
                 )
             )
@@ -46,3 +46,4 @@ object CartManager {
         cartList.clear()
     }
 }
+
