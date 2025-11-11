@@ -95,7 +95,7 @@ class AdminDashboardActivity : AppCompatActivity() {
         container.removeAllViews()
 
         db.collection("orders")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .limit(4)
             .get()
             .addOnSuccessListener { result ->
@@ -110,7 +110,9 @@ class AdminDashboardActivity : AppCompatActivity() {
                 }
 
                 for (doc in result) {
-                    val customer = doc.getString("customerName") ?: "Unknown"
+                    val customer = doc.getString("customerName")
+                        ?: doc.getString("customer")
+                        ?: "Unknown"
                     val status = doc.getString("status") ?: "Pending"
                     val total = doc.getDouble("totalPrice") ?: 0.0
 

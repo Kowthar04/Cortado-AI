@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#F5F1ED">
 
-    <!-- Toolbar / Header -->
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/adminToolbar"
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_arrow_back_white" />
 
-    <!-- Header section -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:layout_marginHorizontal="20dp" />
     </LinearLayout>
 
-    <!-- Reviews List -->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/reviewsRecyclerView"
         android:layout_width="match_parent"

@@ -6,16 +6,20 @@
     android:id="@+id/menuLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F1ED">
+    android:background="#F5F1ED"
+    tools:context=".MenuActivity">
+
 
     <View
         android:id="@+id/headerBackground"
         android:layout_width="0dp"
         android:layout_height="200dp"
+        android:layout_marginTop="4dp"
         android:background="@drawable/coffee_header_gradient"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -27,8 +31,41 @@
         app:titleTextColor="#FFFFFF"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
+
+
+    <ImageButton
+        android:id="@+id/mailButton"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Mail"
+        android:elevation="4dp"
+        android:padding="6dp"
+        android:src="@drawable/baseline_mail_24"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/toolbar"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ImageButton
+        android:id="@+id/cartButton"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Cart"
+        android:elevation="4dp"
+        android:padding="6dp"
+        android:src="@drawable/ic_shopping_cart"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/toolbar"
+        app:layout_constraintVertical_bias="1.0" />
 
     <ImageView
         android:id="@+id/coffeeLogo"
@@ -40,7 +77,8 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp" />
+
 
     <TextView
         android:id="@+id/welcomeText"
@@ -61,7 +99,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp" />
+
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/categoryTabs"
@@ -78,7 +117,8 @@
         app:layout_constraintTop_toBottomOf="@id/headerBackground"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="-20dp"/>
+        android:layout_marginTop="-20dp" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/menuRecyclerView"
@@ -90,7 +130,7 @@
         app:layout_constraintBottom_toTopOf="@id/logoutButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp" />
 
 
     <Button
@@ -107,21 +147,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="16dp"/>
-
-    <ImageButton
-        android:id="@+id/mailButton"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_marginEnd="368dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Notifications"
-        android:elevation="4dp"
-        android:padding="6dp"
-        android:src="@drawable/baseline_mail_24"
-        android:tint="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="@id/toolbar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/toolbar"
-        app:layout_constraintVertical_bias="0.727" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

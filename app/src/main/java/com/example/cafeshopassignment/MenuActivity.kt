@@ -40,9 +40,18 @@ class MenuActivity : AppCompatActivity() {
         val logoutButton = findViewById<Button>(R.id.logoutButton)
         val categoryTabs = findViewById<TabLayout>(R.id.categoryTabs)
         val mailButton = findViewById<ImageButton>(R.id.mailButton)
+
+
+
         mailButton.setOnClickListener {
             startActivity(Intent(this, NotificationInboxActivity::class.java))
         }
+
+        val cartButton = findViewById<ImageButton>(R.id.cartButton)
+        cartButton.setOnClickListener {
+            startActivity(Intent(this, CartActivity::class.java))
+        }
+
         menuRecyclerView = findViewById(R.id.menuRecyclerView)
         menuRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -83,21 +92,6 @@ class MenuActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_activity, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_cart -> {
-                Toast.makeText(this, "Cart clicked!", Toast.LENGTH_SHORT).show() // test
-                startActivity(Intent(this, CartActivity::class.java))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 
 
 

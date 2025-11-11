@@ -176,18 +176,18 @@ class PaymentActivity : AppCompatActivity() {
 
         val userId = currentUser.uid
 
+        val cartItems = CartManager.getCart()
 
         db.collection("users").document(userId).get()
             .addOnSuccessListener { doc ->
                 val customerName = doc.getString("firstname")
                     ?: doc.getString("firstName")
+                    ?:currentUser.displayName
                     ?: "Customer"
-
-                val cartItems = CartManager.getCart()
 
 
                 val orderData = hashMapOf(
-                    "userId" to userId,
+                    "userId" to currentUser.uid,
                     "customerName" to customerName,
                     "items" to cartItems.map {
                         mapOf(
@@ -201,7 +201,7 @@ class PaymentActivity : AppCompatActivity() {
                     "totalPrice" to amount,
                     "paymentMethod" to getSelectedPaymentMethod(),
                     "status" to "Pending",
-                    "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
+                    "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
                     "paymentStatus" to "Completed"
                 )
 

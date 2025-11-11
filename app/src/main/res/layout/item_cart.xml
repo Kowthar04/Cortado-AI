@@ -16,7 +16,7 @@
         android:padding="16dp"
         android:gravity="center_vertical">
 
-        <!-- Coffee Icon -->
+
         <ImageView
             android:layout_width="48dp"
             android:layout_height="48dp"

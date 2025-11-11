@@ -8,5 +8,6 @@ data class Order(
     val items: List<CartItem> = emptyList(),
     val total: Double = 0.0,
     val status: String = "Pending",
-    val timestamp: Timestamp? = null
+    val timestamp: Timestamp? = null,
+    val customerName: String = ""
 )

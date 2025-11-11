@@ -9,7 +9,7 @@
     android:padding="0dp"
     tools:context=".ManageMenuActivity">
 
-    <!-- Top App Bar -->
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/adminToolbar"
         android:layout_width="0dp"
@@ -22,7 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Header Section -->
+
     <LinearLayout
         android:id="@+id/headerSection"
         android:layout_width="0dp"
@@ -60,7 +60,7 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- Menu List -->
+
     <androidx.cardview.widget.CardView
         android:id="@+id/menuListContainer"
         android:layout_width="0dp"
@@ -84,7 +84,7 @@
             android:clipToPadding="false" />
     </androidx.cardview.widget.CardView>
 
-    <!-- Add New Item Button -->
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/addItemButton"
         style="@style/Widget.MaterialComponents.Button"

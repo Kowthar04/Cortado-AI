@@ -46,8 +46,8 @@ class NotificationInboxActivity : AppCompatActivity() {
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
 
         db.collection("notifications")
-            .whereEqualTo("recipientId", currentUser.uid) // ✅ filter for this user only
-            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING) // ✅ match Firestore field
+            .whereEqualTo("recipientId", currentUser.uid)
+            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 notificationList.clear()

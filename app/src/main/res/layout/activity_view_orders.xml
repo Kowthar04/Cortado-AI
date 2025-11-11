@@ -9,7 +9,7 @@
     android:padding="16dp"
     tools:context=".ViewOrdersActivity">
 
-    <!-- Toolbar -->
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/adminToolbar"
         android:layout_width="0dp"
