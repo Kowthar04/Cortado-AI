@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.adapters.AdminOrderAdapter
 import com.example.cafeshopassignment.models.Order
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class ViewOrdersActivity : AppCompatActivity() {
 
@@ -26,11 +28,9 @@ class ViewOrdersActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-
         toolbar.setNavigationOnClickListener {
             finish()
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-
         }
 
         db = FirebaseFirestore.getInstance()
@@ -45,68 +45,61 @@ class ViewOrdersActivity : AppCompatActivity() {
         loadUserRoleAndOrders()
     }
 
-
     private fun loadUserRoleAndOrders() {
         val uid = auth.currentUser?.uid ?: return
-        val userRef = db.collection("users").document(uid)
-
-        userRef.get().addOnSuccessListener { doc ->
-            val role = doc.getString("role")
-
-            if (role == "admin") {
-                loadAllOrders()
-            } else {
-                loadUserOrders(uid)
+        db.collection("users").document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                val role = doc.getString("role") ?: "customer"
+                if (role == "admin") loadAllOrders() else loadUserOrders(uid)
             }
-
-        }.addOnFailureListener {
-            Toast.makeText(this, "Failed to load user role: ${it.message}", Toast.LENGTH_SHORT)
-                .show()
-        }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load user role: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
     }
-
 
     private fun loadAllOrders() {
         db.collection("orders")
-            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 orderList.clear()
                 for (doc in result) {
+                    println("🔥 ORDER FOUND: ${doc.data}") // Optional debug
                     val order = doc.toObject(Order::class.java).copy(id = doc.id)
-                    orderList.add(order)
+                    val safeOrder = order.copy(
+                        customerName = doc.getString("customerName") ?: "Unknown"
+                    )
+                    orderList.add(safeOrder)
                 }
                 adapter.notifyDataSetChanged()
-                Toast.makeText(this, "Loaded ${orderList.size} orders", Toast.LENGTH_SHORT).show()
+
+                if (orderList.isEmpty()) {
+                    Toast.makeText(this, "No orders found.", Toast.LENGTH_SHORT).show()
+                }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Failed to load orders: ${it.message}", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this, "Failed to load orders: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
 
     private fun loadUserOrders(uid: String) {
         db.collection("orders")
             .whereEqualTo("userId", uid)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 orderList.clear()
                 for (doc in result) {
                     val order = doc.toObject(Order::class.java).copy(id = doc.id)
-                    orderList.add(order)
+                    orderList.add(order.copy(customerName = doc.getString("customerName") ?: "You"))
                 }
                 adapter.notifyDataSetChanged()
             }
             .addOnFailureListener {
-                Toast.makeText(
-                    this,
-                    "Failed to load your orders: ${it.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "Failed to load your orders: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
 
     private fun showStatusDialog(order: Order) {
         val statuses = arrayOf("Pending", "Preparing", "Ready for Collection", "Completed")
@@ -118,38 +111,27 @@ class ViewOrdersActivity : AppCompatActivity() {
                 db.collection("orders").document(order.id)
                     .update("status", selected)
                     .addOnSuccessListener {
-                        // ✅ Notification creation moved INSIDE this block
                         val notificationData = hashMapOf(
-                            "recipientId" to order.userId,  // must exist in Order model
+                            "recipientId" to order.userId,
                             "title" to "Order Status Update",
                             "message" to "Your order is now $selected ☕",
-                            "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
+                            "createdAt" to FieldValue.serverTimestamp(),
                             "isRead" to false
                         )
 
                         db.collection("notifications").add(notificationData)
                             .addOnSuccessListener {
-                                Toast.makeText(
-                                    this,
-                                    "Notification sent to user",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(this, "Notification sent!", Toast.LENGTH_SHORT).show()
                             }
                             .addOnFailureListener { e ->
-                                Toast.makeText(
-                                    this,
-                                    "Failed to send notification: ${e.message}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(this, "Failed to send: ${e.message}", Toast.LENGTH_SHORT).show()
                             }
 
-                        Toast.makeText(this, "Status updated to $selected", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(this, "Status updated to $selected", Toast.LENGTH_SHORT).show()
                         loadAllOrders()
                     }
                     .addOnFailureListener {
-                        Toast.makeText(this, "Failed to update order status", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(this, "Failed to update order status", Toast.LENGTH_SHORT).show()
                     }
             }
             .show()
