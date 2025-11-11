@@ -37,30 +37,23 @@ class PaymentActivity : AppCompatActivity() {
         setContentView(R.layout.activity_payment)
         title = "Payment"
 
+        // 🔧 Initialize Firebase
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-
+        // 🧮 Get total amount from intent
         totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
         finalTotal = totalAmount + serviceFee
 
-        applyPromoButton.setOnClickListener {
-            val code = promoCodeInput.text.toString().trim().uppercase()
-            applyPromoCode(code)
-        }
-
-
-        totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
-        this.finalTotal = totalAmount + serviceFee
-
+        // 🧾 UI Elements
         promoCodeInput = findViewById(R.id.promoCodeInput)
         applyPromoButton = findViewById(R.id.applyPromoButton)
-
         val subtotalText = findViewById<TextView>(R.id.subtotalAmount)
         val serviceFeeText = findViewById<TextView>(R.id.serviceFeeAmount)
         val totalText = findViewById<TextView>(R.id.totalAmount)
         val payNowButton = findViewById<Button>(R.id.payNowButton)
 
+        // 💳 Payment options
         cardPaymentRadio = findViewById(R.id.cardPaymentRadio)
         googlePayRadio = findViewById(R.id.googlePayRadio)
         cardDetailsSection = findViewById(R.id.cardDetailsSection)
@@ -72,18 +65,18 @@ class PaymentActivity : AppCompatActivity() {
         val cardPaymentOption = findViewById<MaterialCardView>(R.id.cardPaymentOption)
         val googlePayOption = findViewById<MaterialCardView>(R.id.googlePayOption)
 
-
+        // 💷 Set default amounts
         subtotalText.text = "£${"%.2f".format(totalAmount)}"
         serviceFeeText.text = "£${"%.2f".format(serviceFee)}"
         totalText.text = "£${"%.2f".format(finalTotal)}"
 
-
+        // 🎟️ Apply promo button
         applyPromoButton.setOnClickListener {
             val code = promoCodeInput.text.toString().trim().uppercase()
             applyPromoCode(code, totalText)
         }
 
-
+        // 💳 Payment selection
         cardPaymentOption.setOnClickListener { selectPaymentMethod("card") }
         googlePayOption.setOnClickListener { selectPaymentMethod("googlepay") }
 
@@ -100,14 +93,13 @@ class PaymentActivity : AppCompatActivity() {
             }
         }
 
-
+        // 🧾 Pay Now
         payNowButton.setOnClickListener {
             processPayment(finalTotal)
         }
-
-
     }
 
+    // 🎟️ Apply promo code logic
     private fun applyPromoCode(code: String, totalText: TextView) {
         if (code.isEmpty()) {
             Toast.makeText(this, "Enter promo code first", Toast.LENGTH_SHORT).show()
@@ -115,11 +107,8 @@ class PaymentActivity : AppCompatActivity() {
         }
 
         if (code == "THIRSTY") {
-            // 20% off subtotal + service fee
             discountAmount = (totalAmount + serviceFee) * 0.20
             finalTotal = (totalAmount + serviceFee) - discountAmount
-
-
             if (finalTotal < 0) finalTotal = 0.0
             promoApplied = true
 
@@ -134,6 +123,7 @@ class PaymentActivity : AppCompatActivity() {
         }
     }
 
+    // 💳 Select payment method
     private fun selectPaymentMethod(method: String) {
         when (method) {
             "card" -> {
@@ -146,6 +136,7 @@ class PaymentActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun processPayment(amount: Double) {
         val currentUser = auth.currentUser ?: run {
@@ -177,7 +168,7 @@ class PaymentActivity : AppCompatActivity() {
                         currentUser.displayName ?: currentUser.email?.substringBefore("@") ?: "Customer"
                     }
 
-                // Build order
+
                 val orderData = hashMapOf(
                     "userId" to userId,
                     "customerName" to customerName,
@@ -198,10 +189,10 @@ class PaymentActivity : AppCompatActivity() {
                     "paymentStatus" to "Completed"
                 )
 
-                // 1) Save ORDER
+
                 db.collection("orders").add(orderData)
                     .addOnSuccessListener { orderRef ->
-                        // 2) Save PAYMENT record (separate collection)
+
                         val paymentData = hashMapOf(
                             "orderId" to orderRef.id,
                             "userId" to userId,
@@ -215,9 +206,6 @@ class PaymentActivity : AppCompatActivity() {
                         )
 
                         db.collection("payments").add(paymentData)
-                            .addOnSuccessListener {
-                                // Optional: toast for payment log
-                            }
                             .addOnFailureListener { e ->
                                 Toast.makeText(
                                     this,
@@ -226,7 +214,7 @@ class PaymentActivity : AppCompatActivity() {
                                 ).show()
                             }
 
-                        // Clear cart & go to confirmation
+
                         CartManager.clear()
                         val intent = Intent(this, OrderConfirmationActivity::class.java).apply {
                             putExtra("ORDER_TOTAL", amount)
@@ -243,6 +231,7 @@ class PaymentActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to load user info: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun validateCardDetails(): Boolean {
         val cardNumber = cardNumberInput.text.toString().trim()
@@ -273,6 +262,7 @@ class PaymentActivity : AppCompatActivity() {
         }
         return true
     }
+
 
     private fun getSelectedPaymentMethod(): String {
         return when {

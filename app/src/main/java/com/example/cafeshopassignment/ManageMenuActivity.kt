@@ -86,7 +86,7 @@ class ManageMenuActivity : AppCompatActivity() {
 
                 val newItem = MenuItem(
                     name = name,
-                    price = price, // ✅ match your MenuItem model
+                    price = price,
                     category = category
                 )
 
@@ -110,7 +110,7 @@ class ManageMenuActivity : AppCompatActivity() {
         val categoryInput = dialogView.findViewById<EditText>(R.id.itemCategoryInput)
 
         nameInput.setText(item.name)
-        priceInput.setText(item.price.toString()) // ✅ totalPrice
+        priceInput.setText(item.price.toString())
         categoryInput.setText(item.category)
 
         AlertDialog.Builder(this)
@@ -119,7 +119,7 @@ class ManageMenuActivity : AppCompatActivity() {
             .setPositiveButton("Save") { _, _ ->
                 val updatedItem = mapOf(
                     "name" to nameInput.text.toString().trim(),
-                    "totalPrice" to priceInput.text.toString().toDoubleOrNull(), // ✅ totalPrice
+                    "totalPrice" to priceInput.text.toString().toDoubleOrNull(),
                     "category" to categoryInput.text.toString().trim()
                 )
 

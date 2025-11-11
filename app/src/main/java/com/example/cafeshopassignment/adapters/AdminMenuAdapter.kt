@@ -31,7 +31,7 @@ class AdminMenuAdapter(
     override fun onBindViewHolder(holder: MenuViewHolder, position: Int) {
         val item = menuList[position]
         holder.name.text = item.name
-        holder.price.text = "£${"%.2f".format(item.price)}" // ✅ use totalPrice instead of price
+        holder.price.text = "£${"%.2f".format(item.price)}"
 
         holder.editButton.setOnClickListener { onEdit(item) }
         holder.deleteButton.setOnClickListener { onDelete(item) }

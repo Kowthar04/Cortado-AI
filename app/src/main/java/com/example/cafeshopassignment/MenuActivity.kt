@@ -40,17 +40,17 @@ class MenuActivity : AppCompatActivity() {
         val mailButton = findViewById<ImageButton>(R.id.mailButton)
         val cartButton = findViewById<ImageButton>(R.id.cartButton)
 
-        // 📨 Notifications inbox
+
         mailButton.setOnClickListener {
             startActivity(Intent(this, NotificationInboxActivity::class.java))
         }
 
-        // 🛒 Open Cart
+
         cartButton.setOnClickListener {
             startActivity(Intent(this, CartActivity::class.java))
         }
 
-        // 🔽 Setup RecyclerView
+
         menuRecyclerView = findViewById(R.id.menuRecyclerView)
         menuRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -60,11 +60,11 @@ class MenuActivity : AppCompatActivity() {
         }
         menuRecyclerView.adapter = menuAdapter
 
-        // 🧭 Category tabs
+
         val categories = listOf("Drinks", "Breakfast", "Lunch", "Pastries & Sweets")
         categories.forEach { categoryTabs.addTab(categoryTabs.newTab().setText(it)) }
 
-        loadMenuItems(categories[0]) // default category
+        loadMenuItems(categories[0])
 
         categoryTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -75,7 +75,7 @@ class MenuActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab) {}
         })
 
-        // 👋 Welcome message
+
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val uid = currentUser.uid
@@ -89,7 +89,7 @@ class MenuActivity : AppCompatActivity() {
                 }
         }
 
-        // 🚪 Logout
+
         logoutButton.setOnClickListener {
             auth.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
@@ -97,15 +97,14 @@ class MenuActivity : AppCompatActivity() {
         }
     }
 
-    // 🧾 Load menu items from Firestore
-    // 🧾 Load menu items from Firestore
+
     private fun loadMenuItems(category: String) {
         db.collection("menuItems")
             .whereEqualTo("category", category)
             .get()
             .addOnSuccessListener { documents ->
                 val menuList = documents.map { doc ->
-                    val priceAny = doc.get("price") // ✅ now matches Firestore field name
+                    val priceAny = doc.get("price")
                     val price = when (priceAny) {
                         is Number -> priceAny.toDouble()
                         is String -> priceAny.toDoubleOrNull() ?: 0.0
