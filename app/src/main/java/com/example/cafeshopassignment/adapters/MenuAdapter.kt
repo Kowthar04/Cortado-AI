@@ -26,7 +26,7 @@ class MenuAdapter(
         holder.itemPrice.text = "£${"%.2f".format(item.price)}"
 
         holder.addToCartButton.setOnClickListener {
-            onAddToCartClick(item) // ✅ Pass clicked item
+            onAddToCartClick(item)
         }
     }
 
