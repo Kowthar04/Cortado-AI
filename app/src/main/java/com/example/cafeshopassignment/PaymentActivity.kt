@@ -44,6 +44,14 @@ class PaymentActivity : AppCompatActivity() {
         totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
         finalTotal = totalAmount + serviceFee
 
+        applyPromoButton.setOnClickListener {
+            val code = promoCodeInput.text.toString().trim().uppercase()
+            applyPromoCode(code)
+        }
+
+
+        totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
+        this.finalTotal = totalAmount + serviceFee
 
         promoCodeInput = findViewById(R.id.promoCodeInput)
         applyPromoButton = findViewById(R.id.applyPromoButton)
@@ -93,7 +101,11 @@ class PaymentActivity : AppCompatActivity() {
         }
 
 
-        payNowButton.setOnClickListener { processPayment(finalTotal) }
+        payNowButton.setOnClickListener {
+            processPayment(finalTotal)
+        }
+
+
     }
 
     private fun applyPromoCode(code: String, totalText: TextView) {
@@ -106,6 +118,8 @@ class PaymentActivity : AppCompatActivity() {
             // 20% off subtotal + service fee
             discountAmount = (totalAmount + serviceFee) * 0.20
             finalTotal = (totalAmount + serviceFee) - discountAmount
+
+
             if (finalTotal < 0) finalTotal = 0.0
             promoApplied = true
 
