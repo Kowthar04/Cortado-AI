@@ -59,8 +59,7 @@ class PaymentActivity : AppCompatActivity() {
 
 
         totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
-        val serviceFee = 0.50
-        val finalTotal = totalAmount + serviceFee
+        this.finalTotal = totalAmount + serviceFee
 
 
         val subtotalText = findViewById<TextView>(R.id.subtotalAmount)
@@ -116,7 +115,6 @@ class PaymentActivity : AppCompatActivity() {
         }
 
 
-
     }
 
     private fun applyPromoCode(code: String) {
@@ -129,7 +127,7 @@ class PaymentActivity : AppCompatActivity() {
             discountAmount = (totalAmount + serviceFee) * 0.20   // 20% off
             finalTotal = (totalAmount + serviceFee) - discountAmount
 
-            // Prevent negative totals
+
             if (finalTotal < 0) finalTotal = 0.0
 
             val totalText = findViewById<TextView>(R.id.totalAmount)
