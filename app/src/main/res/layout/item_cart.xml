@@ -4,98 +4,114 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="3dp"
-    app:cardBackgroundColor="#FFFFFF">
+    android:layout_marginVertical="8dp"
+    android:layout_marginHorizontal="4dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="20dp"
         android:gravity="center_vertical">
 
 
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_coffee_cup"
-            app:tint="#8B4513"
-            android:contentDescription="Coffee"
-            android:layout_marginEnd="12dp"/>
+        <FrameLayout
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/ic_check_circle"
+            android:backgroundTint="#FFF3E0"
+            android:layout_marginEnd="16dp">
 
-
-        <TextView
-            android:id="@+id/cartItemName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Latte"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#6D4C41"/>
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_coffee_cup"
+                app:tint="#6D4C41"
+                android:contentDescription="Coffee"
+                android:layout_gravity="center"/>
+        </FrameLayout>
 
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/quantity_background"
-            android:padding="4dp">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="start">
 
-            <Button
-                android:id="@+id/btnMinus"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:text="−"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#9E2B4A"
-                app:cornerRadius="8dp"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"/>
 
             <TextView
-                android:id="@+id/cartQty"
-                android:layout_width="40dp"
+                android:id="@+id/cartItemName"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#6D4C41"
-                android:gravity="center"/>
-
-            <Button
-                android:id="@+id/btnPlus"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:text="+"
+                android:text="Salted Caramel Latte with Whipped Cream and Syrup"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#8B4513"
-                app:cornerRadius="8dp"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"/>
+                android:textColor="#2C2C2C"
+                android:fontFamily="sans-serif-medium"
+                android:singleLine="false"
+                android:ellipsize="none"
+                android:maxLines="3"
+                android:layout_marginBottom="8dp"/>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="8dp">
+
+                <ImageButton
+                    android:id="@+id/btnMinus"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_minus"
+                    android:backgroundTint="#F5F5F5"
+                    android:tint="#6D4C41"
+                    android:contentDescription="Decrease"
+                    android:padding="6dp"
+                    android:scaleType="fitCenter"/>
+
+                <TextView
+                    android:id="@+id/cartQty"
+                    android:layout_width="44dp"
+                    android:layout_height="wrap_content"
+                    android:text="1"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:textColor="#2C2C2C"
+                    android:gravity="center"
+                    android:fontFamily="sans-serif-medium"/>
+
+                <ImageButton
+                    android:id="@+id/btnPlus"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_plus"
+                    android:backgroundTint="#6D4C41"
+                    android:tint="#FFFFFF"
+                    android:contentDescription="Increase"
+                    android:padding="6dp"
+                    android:scaleType="fitCenter"/>
+            </LinearLayout>
         </LinearLayout>
+
 
         <TextView
             android:id="@+id/cartItemPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="£3.50"
-            android:textSize="16sp"
+            android:text="£3.80"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#9E2B4A"/>
-
+            android:textColor="#6D4C41"
+            android:fontFamily="sans-serif-medium"
+            android:layout_gravity="bottom"/>
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

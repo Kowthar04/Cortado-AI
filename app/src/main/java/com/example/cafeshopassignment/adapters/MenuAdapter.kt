@@ -8,6 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.R
 import com.example.cafeshopassignment.models.MenuItem
+import android.widget.ImageView
+import com.bumptech.glide.Glide
+import android.util.Log
+
+
 
 class MenuAdapter(
     private var menuList: List<MenuItem>,
@@ -25,18 +30,25 @@ class MenuAdapter(
         holder.itemName.text = item.name
         holder.itemPrice.text = "£${"%.2f".format(item.price)}"
 
+        Log.d("MenuAdapter", "Image URL for ${item.name}: ${item.imageUrl}")
+
+        Glide.with(holder.itemView.context)
+            .load(item.imageUrl)
+            .centerCrop()
+            .into(holder.itemImage)
 
         holder.addToCartButton.setOnClickListener {
             onAddToCartClick(item)
         }
     }
-
     override fun getItemCount() = menuList.size
 
     class MenuViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemName: TextView = itemView.findViewById(R.id.itemName)
         val itemPrice: TextView = itemView.findViewById(R.id.itemPrice)
         val addToCartButton: Button = itemView.findViewById(R.id.addToCartButton)
+
+        val itemImage: ImageView = itemView.findViewById(R.id.itemImage)
     }
 
     fun updateData(newList: List<MenuItem>) {

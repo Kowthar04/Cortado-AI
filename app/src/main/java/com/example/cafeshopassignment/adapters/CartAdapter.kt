@@ -1,9 +1,10 @@
 package com.example.cafeshopassignment.adapters
 
+import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.CartManager
@@ -26,12 +27,12 @@ class CartAdapter(private var cartItems: MutableList<CartItem>, private val upda
         holder.price.text = "£${"%.2f".format(item.totalPrice)}"
         holder.quantity.text = item.quantity.toString()
 
-        holder.plus.setOnClickListener {
+        holder.btnPlus.setOnClickListener {
             CartManager.increaseQuantity(item.id)
             refresh()
         }
 
-        holder.minus.setOnClickListener {
+        holder.btnMinus.setOnClickListener {
             CartManager.decreaseQuantity(item.id)
             refresh()
         }
@@ -49,7 +50,7 @@ class CartAdapter(private var cartItems: MutableList<CartItem>, private val upda
         val name: TextView = view.findViewById(R.id.cartItemName)
         val price: TextView = view.findViewById(R.id.cartItemPrice)
         val quantity: TextView = view.findViewById(R.id.cartQty)
-        val plus: Button = view.findViewById(R.id.btnPlus)
-        val minus: Button = view.findViewById(R.id.btnMinus)
+        val btnPlus: ImageButton = view.findViewById(R.id.btnPlus)
+        val btnMinus: ImageButton = view.findViewById(R.id.btnMinus)
     }
 }
