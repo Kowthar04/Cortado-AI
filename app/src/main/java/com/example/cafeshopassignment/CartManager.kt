@@ -20,7 +20,8 @@ object CartManager {
                     name = item.name,
 
                     price = item.price,
-                    quantity = 1
+                    quantity = 1,
+                    imageUrl = item.imageUrl
                 )
             )
         }

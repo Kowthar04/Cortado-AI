@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.cafeshopassignment.CartManager
 import com.example.cafeshopassignment.R
 import com.example.cafeshopassignment.models.CartItem
@@ -26,6 +28,11 @@ class CartAdapter(private var cartItems: MutableList<CartItem>, private val upda
         holder.name.text = item.name
         holder.price.text = "£${"%.2f".format(item.totalPrice)}"
         holder.quantity.text = item.quantity.toString()
+
+        Glide.with(holder.itemView.context)
+            .load(item.imageUrl)
+            .centerCrop()
+            .into(holder.cartItemImage)
 
         holder.btnPlus.setOnClickListener {
             CartManager.increaseQuantity(item.id)
@@ -48,6 +55,7 @@ class CartAdapter(private var cartItems: MutableList<CartItem>, private val upda
 
     class CartViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.cartItemName)
+        val cartItemImage: ImageView = view.findViewById(R.id.cartItemImage)
         val price: TextView = view.findViewById(R.id.cartItemPrice)
         val quantity: TextView = view.findViewById(R.id.cartQty)
         val btnPlus: ImageButton = view.findViewById(R.id.btnPlus)
