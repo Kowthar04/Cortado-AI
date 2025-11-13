@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#FFFFFF"/>
+    <size android:width="50dp" android:height="50dp"/>
+    <corners android:radius="25dp"/>
+    <padding android:top="6dp" android:bottom="6dp" android:left="6dp" android:right="6dp"/>
+    <stroke android:width="1dp" android:color="#DDDDDD"/>
+    <shadowColor>#40000000</shadowColor>
+    <shadowDx>0</shadowDx>
+    <shadowDy>2</shadowDy>
+    <shadowRadius>6</shadowRadius>
+</shape>

@@ -15,10 +15,11 @@ class AdminOrderAdapter(
 ) : RecyclerView.Adapter<AdminOrderAdapter.OrderViewHolder>() {
 
     inner class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val customerName: TextView = view.findViewById(R.id.customerName)
         val userIdText: TextView = view.findViewById(R.id.userIdText)
+        val orderItems: TextView = view.findViewById(R.id.orderItems)
         val orderStatus: TextView = view.findViewById(R.id.orderStatus)
         val orderTotal: TextView = view.findViewById(R.id.orderTotal)
-        val orderItems: TextView = view.findViewById(R.id.orderItems)
         val updateButton: Button = view.findViewById(R.id.updateStatusButton)
     }
 
@@ -31,17 +32,28 @@ class AdminOrderAdapter(
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
         val order = orders[position]
 
+
+        val safeName = if (order.customerName.isNotBlank()) order.customerName else "Unknown"
+        holder.customerName.text = "Customer: $safeName"
+
+
         holder.userIdText.text = "User ID: ${order.userId}"
-        holder.orderStatus.text = "Status: ${order.status}"
-        holder.orderTotal.text = "Total: £${"%.2f".format(order.totalPrice)}" // ✅ fixed
 
-        val itemNames = order.items.joinToString(", ") { item ->
-            val name = item["name"] as? String ?: "Unknown"
-            val quantity = (item["quantity"] as? Long)?.toInt() ?: 1
-            "$name ×$quantity"
+
+        val itemsFormatted = order.items.joinToString(", ") { map ->
+            val name = map["name"] as? String ?: "Unknown"
+            val qty = (map["quantity"] as? Long)?.toInt() ?: 1
+            "$name ×$qty"
         }
+        holder.orderItems.text = "Items: $itemsFormatted"
 
-        holder.orderItems.text = "Items: $itemNames"
+
+        holder.orderStatus.text = "Status: ${order.status}"
+
+
+        holder.orderTotal.text = "Total: £${"%.2f".format(order.totalPrice)}"
+
+
         holder.updateButton.setOnClickListener { onUpdateStatus(order) }
     }
 

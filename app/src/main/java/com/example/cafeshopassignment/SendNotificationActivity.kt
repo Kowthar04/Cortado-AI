@@ -12,6 +12,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import androidx.appcompat.widget.SwitchCompat
 import com.google.firebase.firestore.FieldValue
 import java.util.UUID
+import android.widget.ImageButton
+
 
 class SendNotificationActivity : AppCompatActivity() {
 
@@ -26,16 +28,12 @@ class SendNotificationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_send_notification)
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.sendNotificationToolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-
-        toolbar.setNavigationOnClickListener {
+        val backButton = findViewById<ImageButton>(R.id.backButton)
+        backButton.setOnClickListener {
             finish()
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-
         }
+
 
         db = FirebaseFirestore.getInstance()
 

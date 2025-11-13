@@ -1,38 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="20dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:background="#F5F1ED">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add New Item"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#810100"
+        android:layout_marginBottom="12dp" />
 
     <EditText
         android:id="@+id/itemNameInput"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Item Name"
-        android:inputType="textPersonName"
-        android:padding="10dp" />
+        android:layout_height="48dp"
+        android:background="@drawable/input_background"
+        android:hint="Item name"
+        android:padding="12dp"
+        android:textColor="#4A2C2A"
+        android:textColorHint="#A1887F" />
 
     <EditText
         android:id="@+id/itemPriceInput"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:background="@drawable/input_background"
         android:hint="Price (£)"
+        android:padding="12dp"
         android:inputType="numberDecimal"
-        android:padding="10dp"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="12dp"
+        android:textColor="#4A2C2A"
+        android:textColorHint="#A1887F" />
 
     <EditText
         android:id="@+id/itemCategoryInput"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Category (e.g., Drinks, Pastries)"
-        android:inputType="textPersonName"
-        android:padding="10dp"
-        android:layout_marginTop="10dp" />
+        android:layout_height="48dp"
+        android:background="@drawable/input_background"
+        android:hint="Category (Drinks, Breakfast...)"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
+        android:textColor="#4A2C2A"
+        android:textColorHint="#A1887F" />
 
 </LinearLayout>
-
-

@@ -53,28 +53,38 @@ class ReviewActivity : AppCompatActivity() {
             return
         }
 
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            Toast.makeText(this, "You need to be logged in to review", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val currentUser = auth.currentUser ?: return
 
-        val reviewData = hashMapOf(
-            "orderId" to orderId,
-            "customerId" to currentUser.uid,
-            "rating" to ratingValue,
-            "comment" to commentText,
-            "createdAt" to Timestamp.now()
-        )
+        val userId = currentUser.uid
 
-        db.collection("reviews")
-            .add(reviewData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Review submitted!", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to submit review: ${e.message}", Toast.LENGTH_SHORT).show()
+
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { doc ->
+                val first = doc.getString("firstname") ?: ""
+                val last = doc.getString("surname") ?: ""
+
+                val customerFullName = "$first $last".trim()
+                    .ifBlank { currentUser.email?.substringBefore("@") ?: "Customer" }
+
+                val reviewData = hashMapOf(
+                    "orderId" to orderId,
+                    "customerId" to userId,
+                    "customerName" to customerFullName,
+                    "rating" to ratingValue,
+                    "comment" to commentText,
+                    "createdAt" to Timestamp.now()
+                )
+
+                db.collection("reviews")
+                    .add(reviewData)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Review submitted!", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Failed to submit review: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
             }
     }
+
 }

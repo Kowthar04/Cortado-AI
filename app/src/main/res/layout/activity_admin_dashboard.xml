@@ -1,63 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F1ED"
-    android:padding="16dp"
-    tools:context=".AdminDashboardActivity">
+    android:paddingTop="48dp"
+    android:paddingBottom="24dp">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+
+        <ImageButton
+            android:id="@+id/backButtonDashboard"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_arrow_back_white"
+            app:tint="#810100"
+            android:contentDescription="Back" />
 
 
         <TextView
             android:id="@+id/adminWelcomeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome back, Admin!"
-            android:textSize="24sp"
-            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:text="Welcome, Admin!"
             android:textColor="#4A2C2A"
-            android:layout_marginBottom="4dp"/>
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
 
         <TextView
             android:id="@+id/dashboardSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Here’s your café overview ☕"
-            android:textSize="14sp"
+            android:text="Your café management centre ☕"
             android:textColor="#7B5A4D"
-            android:layout_marginBottom="20dp"/>
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+
+        <LinearLayout
+            android:id="@+id/analyticsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:weightSum="3">
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Revenue Today"
+                        android:textColor="#7B5A4D"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/valueRevenueToday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="£0.00"
+                        android:textColor="#4A2C2A"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Orders Today"
+                        android:textColor="#7B5A4D"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/valueOrdersToday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#4A2C2A"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Users"
+                        android:textColor="#7B5A4D"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/valueTotalUsers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#4A2C2A"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
 
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardManageMenu"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            app:cardCornerRadius="18dp"
+            android:layout_marginTop="24dp"
             app:cardElevation="6dp"
+            app:cardCornerRadius="18dp"
             android:backgroundTint="#FFFFFF"
-            android:layout_marginBottom="16dp"
             android:clickable="true"
             android:foreground="?android:attr/selectableItemBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
                 android:gravity="center"
-                android:padding="16dp">
+                android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_coffee_cup"
-                    app:tint="#810100"
-                    android:layout_marginBottom="8dp"/>
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/baseline_restaurant_menu_24"
+                    app:tint="#810100" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -65,44 +191,42 @@
                     android:text="Manage Menu"
                     android:textColor="#4A2C2A"
                     android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:textSize="18sp"
+                    android:layout_marginTop="10dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
             android:weightSum="2">
-
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardViewFeedback"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_weight="1"
+                android:layout_marginEnd="8dp"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="6dp"
                 android:backgroundTint="#FFFFFF"
-                android:layout_marginEnd="8dp"
                 android:clickable="true"
                 android:foreground="?android:attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp">
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/ic_check_circle"
-                        app:tint="#810100"
-                        android:layout_marginBottom="8dp"/>
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:src="@drawable/ic_feedback"
+                        app:tint="#810100" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -110,36 +234,34 @@
                         android:text="View Feedback"
                         android:textColor="#4A2C2A"
                         android:textStyle="bold"
-                        android:textSize="16sp"/>
+                        android:textSize="15sp"
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardSendNotifications"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_weight="1"
+                android:layout_marginStart="8dp"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="6dp"
                 android:backgroundTint="#FFFFFF"
-                android:layout_marginStart="8dp"
                 android:clickable="true"
                 android:foreground="?android:attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp">
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:src="@drawable/baseline_mail_24"
-                        app:tint="#810100"
-                        android:layout_marginBottom="8dp"/>
+                        app:tint="#810100" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -147,25 +269,61 @@
                         android:text="Send Notifications"
                         android:textColor="#4A2C2A"
                         android:textStyle="bold"
-                        android:textSize="16sp"/>
+                        android:textSize="15sp"
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardRecentOrders"
+            android:id="@+id/cardAnalytics"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="150dp"
+            android:layout_marginTop="16dp"
             app:cardCornerRadius="18dp"
             app:cardElevation="6dp"
             android:backgroundTint="#FFFFFF"
-            android:layout_marginBottom="16dp">
+            android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
             <LinearLayout
-                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@drawable/baseline_analytics_24"
+                    app:tint="#810100" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Analytics and Reports"
+                    android:textColor="#4A2C2A"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardRecentOrders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp"
+            android:backgroundTint="#FFFFFF">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
@@ -175,41 +333,38 @@
                     android:textColor="#4A2C2A"
                     android:textStyle="bold"
                     android:textSize="18sp"
-                    android:layout_marginBottom="8dp"/>
-
+                    android:layout_marginBottom="10dp" />
 
                 <LinearLayout
                     android:id="@+id/ordersPreviewContainer"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:divider="?android:attr/dividerHorizontal"
-                    android:showDividers="middle"/>
+                    android:orientation="vertical" />
 
                 <Button
                     android:id="@+id/viewMoreOrdersButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
+                    android:backgroundTint="#810100"
                     android:text="View More Orders"
                     android:textColor="@android:color/white"
-                    android:backgroundTint="#810100"
                     android:textStyle="bold"
-                    android:layout_marginTop="12dp"
-                    app:cornerRadius="12dp"/>
+                    android:layout_marginTop="16dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
 
         <Button
             android:id="@+id/AdminLogoutButton"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:text="Logout"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
+            android:layout_marginTop="24dp"
             android:backgroundTint="#4A2C2A"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="12dp"
-            app:cornerRadius="12dp"/>
+            android:text="Logout"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:fontFamily="serif" />
 
     </LinearLayout>
+
 </ScrollView>

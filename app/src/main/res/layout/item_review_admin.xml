@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp"
+    android:elevation="4dp">
+
+    <TextView
+        android:id="@+id/reviewCustomerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="From: Customer Name"
+        android:textStyle="bold"
+        android:textColor="#4A2C2A"
+        android:textSize="16sp"
+        android:layout_marginBottom="4dp" />
+
+    <RatingBar
+        android:id="@+id/reviewRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:isIndicator="true"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/reviewComment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#1B1717"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/reviewDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#810100"
+        android:textSize="12sp"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/replyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reply"
+        android:backgroundTint="#810100"
+        android:textColor="@android:color/white"
+        android:paddingHorizontal="16dp" />
+
+</LinearLayout>

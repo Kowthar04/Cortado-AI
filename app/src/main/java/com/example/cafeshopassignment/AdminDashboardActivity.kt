@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -28,7 +29,11 @@ class AdminDashboardActivity : AppCompatActivity() {
 
         val welcomeText = findViewById<TextView>(R.id.adminWelcomeText)
         val logoutButton = findViewById<Button>(R.id.AdminLogoutButton)
+        val backButton = findViewById<ImageButton>(R.id.backButtonDashboard)
 
+        backButton.setOnClickListener {
+            finish()
+        }
 
         val currentUser = auth.currentUser
         if (currentUser != null) {
@@ -37,7 +42,6 @@ class AdminDashboardActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
-
                         val firstName = document.getString("firstname")
                             ?: document.getString("firstName")
                             ?: "Admin"
@@ -70,6 +74,12 @@ class AdminDashboardActivity : AppCompatActivity() {
                 startActivity(Intent(this, SendNotificationActivity::class.java))
             }
 
+        findViewById<androidx.cardview.widget.CardView>(R.id.cardAnalytics)
+            .setOnClickListener {
+
+                Toast.makeText(this, "Analytics screen coming soon!", Toast.LENGTH_SHORT).show()
+            }
+
         findViewById<Button>(R.id.viewMoreOrdersButton)
             .setOnClickListener {
                 startActivity(Intent(this, ViewOrdersActivity::class.java))
@@ -77,7 +87,7 @@ class AdminDashboardActivity : AppCompatActivity() {
 
 
         loadRecentOrders()
-
+        loadDashboardAnalytics()
 
         logoutButton.setOnClickListener {
             auth.signOut()
@@ -89,6 +99,11 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadDashboardAnalytics()
+        loadRecentOrders()
+    }
 
     private fun loadRecentOrders() {
         val container = findViewById<LinearLayout>(R.id.ordersPreviewContainer)
@@ -142,10 +157,10 @@ class AdminDashboardActivity : AppCompatActivity() {
                         setTypeface(null, Typeface.BOLD)
                         background = resources.getDrawable(R.drawable.status_badge_background, null)
                         backgroundTintList = when (status.lowercase()) {
-                            "completed" -> android.content.res.ColorStateList.valueOf(Color.parseColor("#4CAF50")) // Green
-                            "preparing" -> android.content.res.ColorStateList.valueOf(Color.parseColor("#FF9800")) // Orange
-                            "ready for collection" -> android.content.res.ColorStateList.valueOf(Color.parseColor("#8B4513")) // Coffee brown
-                            else -> android.content.res.ColorStateList.valueOf(Color.parseColor("#B0BEC5")) // Grey
+                            "completed" -> android.content.res.ColorStateList.valueOf(Color.parseColor("#4CAF50"))
+                            "preparing" -> android.content.res.ColorStateList.valueOf(Color.parseColor("#FF9800"))
+                            "ready for collection" -> android.content.res.ColorStateList.valueOf(Color.parseColor("#8B4513"))
+                            else -> android.content.res.ColorStateList.valueOf(Color.parseColor("#B0BEC5"))
                         }
                     }
 
@@ -162,4 +177,48 @@ class AdminDashboardActivity : AppCompatActivity() {
                 container.addView(errorText)
             }
     }
+
+
+
+    private fun loadDashboardAnalytics() {
+        loadUsersCount()
+        loadTodayOrders()
+    }
+
+    private fun loadUsersCount() {
+        db.collection("users")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                findViewById<TextView>(R.id.valueTotalUsers).text = snapshot.size().toString()
+            }
+    }
+
+    private fun loadTodayOrders() {
+        val cal = java.util.Calendar.getInstance()
+
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+        cal.set(java.util.Calendar.MINUTE, 0)
+        cal.set(java.util.Calendar.SECOND, 0)
+        val start = cal.time
+
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 23)
+        cal.set(java.util.Calendar.MINUTE, 59)
+        cal.set(java.util.Calendar.SECOND, 59)
+        val end = cal.time
+
+        db.collection("orders")
+            .whereGreaterThanOrEqualTo("createdAt", start)
+            .whereLessThanOrEqualTo("createdAt", end)
+            .get()
+            .addOnSuccessListener { docs ->
+                var revenue = 0.0
+                docs.forEach { d ->
+                    revenue += d.getDouble("totalPrice") ?: 0.0
+                }
+
+                findViewById<TextView>(R.id.valueOrdersToday).text = docs.size().toString()
+                findViewById<TextView>(R.id.valueRevenueToday).text = "£%.2f".format(revenue)
+            }
+    }
+
 }

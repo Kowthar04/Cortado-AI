@@ -37,15 +37,15 @@ class PaymentActivity : AppCompatActivity() {
         setContentView(R.layout.activity_payment)
         title = "Payment"
 
-        // 🔧 Initialize Firebase
+
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-        // 🧮 Get total amount from intent
+
         totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
         finalTotal = totalAmount + serviceFee
 
-        // 🧾 UI Elements
+
         promoCodeInput = findViewById(R.id.promoCodeInput)
         applyPromoButton = findViewById(R.id.applyPromoButton)
         val subtotalText = findViewById<TextView>(R.id.subtotalAmount)
@@ -53,7 +53,7 @@ class PaymentActivity : AppCompatActivity() {
         val totalText = findViewById<TextView>(R.id.totalAmount)
         val payNowButton = findViewById<Button>(R.id.payNowButton)
 
-        // 💳 Payment options
+
         cardPaymentRadio = findViewById(R.id.cardPaymentRadio)
         googlePayRadio = findViewById(R.id.googlePayRadio)
         cardDetailsSection = findViewById(R.id.cardDetailsSection)
@@ -65,18 +65,18 @@ class PaymentActivity : AppCompatActivity() {
         val cardPaymentOption = findViewById<MaterialCardView>(R.id.cardPaymentOption)
         val googlePayOption = findViewById<MaterialCardView>(R.id.googlePayOption)
 
-        // 💷 Set default amounts
+
         subtotalText.text = "£${"%.2f".format(totalAmount)}"
         serviceFeeText.text = "£${"%.2f".format(serviceFee)}"
         totalText.text = "£${"%.2f".format(finalTotal)}"
 
-        // 🎟️ Apply promo button
+
         applyPromoButton.setOnClickListener {
             val code = promoCodeInput.text.toString().trim().uppercase()
             applyPromoCode(code, totalText)
         }
 
-        // 💳 Payment selection
+
         cardPaymentOption.setOnClickListener { selectPaymentMethod("card") }
         googlePayOption.setOnClickListener { selectPaymentMethod("googlepay") }
 
@@ -93,13 +93,13 @@ class PaymentActivity : AppCompatActivity() {
             }
         }
 
-        // 🧾 Pay Now
+
         payNowButton.setOnClickListener {
             processPayment(finalTotal)
         }
     }
 
-    // 🎟️ Apply promo code logic
+
     private fun applyPromoCode(code: String, totalText: TextView) {
         if (code.isEmpty()) {
             Toast.makeText(this, "Enter promo code first", Toast.LENGTH_SHORT).show()
@@ -123,7 +123,7 @@ class PaymentActivity : AppCompatActivity() {
         }
     }
 
-    // 💳 Select payment method
+
     private fun selectPaymentMethod(method: String) {
         when (method) {
             "card" -> {
