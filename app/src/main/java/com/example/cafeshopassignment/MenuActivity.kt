@@ -6,8 +6,10 @@ import android.view.Menu
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.adapters.MenuAdapter
@@ -22,6 +24,11 @@ class MenuActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private lateinit var menuRecyclerView: RecyclerView
     private lateinit var menuAdapter: MenuAdapter
+
+    private lateinit var adapter: MenuAdapter
+
+    private val fullMenuList = mutableListOf<MenuItem>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +72,8 @@ class MenuActivity : AppCompatActivity() {
         categories.forEach { categoryTabs.addTab(categoryTabs.newTab().setText(it)) }
 
         loadMenuItems(categories[0])
+
+
 
         categoryTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
