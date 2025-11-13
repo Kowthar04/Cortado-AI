@@ -121,7 +121,6 @@
         app:tabPaddingStart="24dp"
         app:tabPaddingEnd="24dp" />
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/menuRecyclerView"
         android:layout_width="0dp"
