@@ -14,7 +14,7 @@ class OrderStatusTest {
             id = "001",
             customerName = "Amina Ali",
             status = "Pending",
-            total = 7.50
+            totalPrice = 7.50
         )
     }
 
@@ -58,9 +58,9 @@ class OrderStatusTest {
 
     @Test
     fun updatingStatus_doesNotAffectTotalPrice() {
-        val originalTotal = baseOrder.total
+        val originalTotal = baseOrder.totalPrice
         val updated = baseOrder.copy(status = "Preparing")
-        assertEquals(originalTotal, updated.total, 0.0)
-        assertEquals(originalTotal, baseOrder.total, 0.0)
+        assertEquals(originalTotal, updated.totalPrice, 0.0)
+        assertEquals(originalTotal, baseOrder.totalPrice, 0.0)
     }
 }
