@@ -5,7 +5,7 @@ data class CartItem(
     val name: String = "",
     val price: Double = 0.0,
     var quantity: Int = 1,
-    val imageUrl: String = ""
+    val imageUrl: String = "",
 ) {
     val totalPrice: Double
         get() = price * quantity

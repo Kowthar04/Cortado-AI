@@ -2,7 +2,11 @@ package com.example.cafeshopassignment
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.FirebaseAuth
@@ -10,7 +14,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 class PaymentActivity : AppCompatActivity() {
-
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
@@ -37,14 +40,11 @@ class PaymentActivity : AppCompatActivity() {
         setContentView(R.layout.activity_payment)
         title = "Payment"
 
-
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-
         totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
         finalTotal = totalAmount + serviceFee
-
 
         promoCodeInput = findViewById(R.id.promoCodeInput)
         applyPromoButton = findViewById(R.id.applyPromoButton)
@@ -52,7 +52,6 @@ class PaymentActivity : AppCompatActivity() {
         val serviceFeeText = findViewById<TextView>(R.id.serviceFeeAmount)
         val totalText = findViewById<TextView>(R.id.totalAmount)
         val payNowButton = findViewById<Button>(R.id.payNowButton)
-
 
         cardPaymentRadio = findViewById(R.id.cardPaymentRadio)
         googlePayRadio = findViewById(R.id.googlePayRadio)
@@ -65,17 +64,18 @@ class PaymentActivity : AppCompatActivity() {
         val cardPaymentOption = findViewById<MaterialCardView>(R.id.cardPaymentOption)
         val googlePayOption = findViewById<MaterialCardView>(R.id.googlePayOption)
 
-
         subtotalText.text = "£${"%.2f".format(totalAmount)}"
         serviceFeeText.text = "£${"%.2f".format(serviceFee)}"
         totalText.text = "£${"%.2f".format(finalTotal)}"
 
-
         applyPromoButton.setOnClickListener {
-            val code = promoCodeInput.text.toString().trim().uppercase()
+            val code =
+                promoCodeInput.text
+                    .toString()
+                    .trim()
+                    .uppercase()
             applyPromoCode(code, totalText)
         }
-
 
         cardPaymentOption.setOnClickListener { selectPaymentMethod("card") }
         googlePayOption.setOnClickListener { selectPaymentMethod("googlepay") }
@@ -93,14 +93,15 @@ class PaymentActivity : AppCompatActivity() {
             }
         }
 
-
         payNowButton.setOnClickListener {
             processPayment(finalTotal)
         }
     }
 
-
-    private fun applyPromoCode(code: String, totalText: TextView) {
+    private fun applyPromoCode(
+        code: String,
+        totalText: TextView,
+    ) {
         if (code.isEmpty()) {
             Toast.makeText(this, "Enter promo code first", Toast.LENGTH_SHORT).show()
             return
@@ -123,7 +124,6 @@ class PaymentActivity : AppCompatActivity() {
         }
     }
 
-
     private fun selectPaymentMethod(method: String) {
         when (method) {
             "card" -> {
@@ -137,13 +137,12 @@ class PaymentActivity : AppCompatActivity() {
         }
     }
 
-
     private fun processPayment(amount: Double) {
-        val currentUser = auth.currentUser ?: run {
-            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
-            return
-        }
-
+        val currentUser =
+            auth.currentUser ?: run {
+                Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+                return
+            }
 
         if (cardPaymentRadio.isChecked && !validateCardDetails()) return
         if (!cardPaymentRadio.isChecked && !googlePayRadio.isChecked) {
@@ -156,82 +155,88 @@ class PaymentActivity : AppCompatActivity() {
         val userId = currentUser.uid
         val cartItems = CartManager.getCart()
 
-
-        db.collection("users").document(userId).get()
+        db
+            .collection("users")
+            .document(userId)
+            .get()
             .addOnSuccessListener { doc ->
                 val firstName = doc.getString("firstname") ?: ""
                 val lastName = doc.getString("surname") ?: ""
-                val customerName = listOf(firstName, lastName)
-                    .filter { it.isNotBlank() }
-                    .joinToString(" ")
-                    .ifBlank {
-                        currentUser.displayName ?: currentUser.email?.substringBefore("@") ?: "Customer"
-                    }
+                val customerName =
+                    listOf(firstName, lastName)
+                        .filter { it.isNotBlank() }
+                        .joinToString(" ")
+                        .ifBlank {
+                            currentUser.displayName ?: currentUser.email?.substringBefore("@") ?: "Customer"
+                        }
 
+                val orderData =
+                    hashMapOf(
+                        "userId" to userId,
+                        "customerName" to customerName,
+                        "items" to
+                            cartItems.map {
+                                mapOf(
+                                    "name" to it.name,
+                                    "quantity" to it.quantity,
+                                    "price" to it.price,
+                                )
+                            },
+                        "subtotal" to totalAmount,
+                        "serviceFee" to serviceFee,
+                        "discount" to discountAmount,
+                        "totalPrice" to amount,
+                        "paymentMethod" to getSelectedPaymentMethod(),
+                        "status" to "Pending",
+                        "createdAt" to FieldValue.serverTimestamp(),
+                        "paymentStatus" to "Completed",
+                    )
 
-                val orderData = hashMapOf(
-                    "userId" to userId,
-                    "customerName" to customerName,
-                    "items" to cartItems.map {
-                        mapOf(
-                            "name" to it.name,
-                            "quantity" to it.quantity,
-                            "price" to it.price
-                        )
-                    },
-                    "subtotal" to totalAmount,
-                    "serviceFee" to serviceFee,
-                    "discount" to discountAmount,
-                    "totalPrice" to amount,
-                    "paymentMethod" to getSelectedPaymentMethod(),
-                    "status" to "Pending",
-                    "createdAt" to FieldValue.serverTimestamp(),
-                    "paymentStatus" to "Completed"
-                )
-
-
-                db.collection("orders").add(orderData)
+                db
+                    .collection("orders")
+                    .add(orderData)
                     .addOnSuccessListener { orderRef ->
 
-                        val paymentData = hashMapOf(
-                            "orderId" to orderRef.id,
-                            "userId" to userId,
-                            "customerName" to customerName,
-                            "amountPaid" to amount,
-                            "paymentMethod" to getSelectedPaymentMethod(),
-                            "paymentStatus" to "Completed",
-                            "promoApplied" to promoApplied,
-                            "discountAmount" to discountAmount,
-                            "createdAt" to FieldValue.serverTimestamp()
-                        )
+                        val paymentData =
+                            hashMapOf(
+                                "orderId" to orderRef.id,
+                                "userId" to userId,
+                                "customerName" to customerName,
+                                "amountPaid" to amount,
+                                "paymentMethod" to getSelectedPaymentMethod(),
+                                "paymentStatus" to "Completed",
+                                "promoApplied" to promoApplied,
+                                "discountAmount" to discountAmount,
+                                "createdAt" to FieldValue.serverTimestamp(),
+                            )
 
-                        db.collection("payments").add(paymentData)
+                        db
+                            .collection("payments")
+                            .add(paymentData)
                             .addOnFailureListener { e ->
-                                Toast.makeText(
-                                    this,
-                                    "Failed to record payment: ${e.message}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast
+                                    .makeText(
+                                        this,
+                                        "Failed to record payment: ${e.message}",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
                             }
 
-
                         CartManager.clear()
-                        val intent = Intent(this, OrderConfirmationActivity::class.java).apply {
-                            putExtra("ORDER_TOTAL", amount)
-                            putExtra("ORDER_ID", orderRef.id)
-                        }
+                        val intent =
+                            Intent(this, OrderConfirmationActivity::class.java).apply {
+                                putExtra("ORDER_TOTAL", amount)
+                                putExtra("ORDER_ID", orderRef.id)
+                            }
                         startActivity(intent)
                         finish()
-                    }
-                    .addOnFailureListener { e ->
+                    }.addOnFailureListener { e ->
                         Toast.makeText(this, "Payment failed: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-            }
-            .addOnFailureListener { e ->
+            }.addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to load user info: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
 
     private fun validateCardDetails(): Boolean {
         val cardNumber = cardNumberInput.text.toString().trim()
@@ -263,12 +268,10 @@ class PaymentActivity : AppCompatActivity() {
         return true
     }
 
-
-    private fun getSelectedPaymentMethod(): String {
-        return when {
+    private fun getSelectedPaymentMethod(): String =
+        when {
             cardPaymentRadio.isChecked -> "Credit/Debit Card"
             googlePayRadio.isChecked -> "Google Pay"
             else -> "Unknown"
         }
-    }
 }

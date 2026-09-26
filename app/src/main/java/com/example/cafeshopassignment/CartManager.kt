@@ -4,7 +4,6 @@ import com.example.cafeshopassignment.models.CartItem
 import com.example.cafeshopassignment.models.MenuItem
 
 object CartManager {
-
     private val cartList = mutableListOf<CartItem>()
 
     fun addItem(item: MenuItem) {
@@ -18,11 +17,10 @@ object CartManager {
                 CartItem(
                     id = itemId,
                     name = item.name,
-
                     price = item.price,
                     quantity = 1,
-                    imageUrl = item.imageUrl
-                )
+                    imageUrl = item.imageUrl,
+                ),
             )
         }
     }
@@ -47,4 +45,3 @@ object CartManager {
         cartList.clear()
     }
 }
-

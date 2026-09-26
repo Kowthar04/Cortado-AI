@@ -1,0 +1,20 @@
+# https://editorconfig.org — shared by Android Studio and ktlint.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+# ktlint's default ruleset (ktlint_official code style) is used as-is.
+max_line_length = 140
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

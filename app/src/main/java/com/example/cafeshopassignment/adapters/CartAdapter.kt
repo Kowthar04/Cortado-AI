@@ -1,6 +1,5 @@
 package com.example.cafeshopassignment.adapters
 
-import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,23 +12,33 @@ import com.example.cafeshopassignment.CartManager
 import com.example.cafeshopassignment.R
 import com.example.cafeshopassignment.models.CartItem
 
-class CartAdapter(private var cartItems: MutableList<CartItem>, private val updateTotal: () -> Unit) :
-    RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_cart, parent, false)
+class CartAdapter(
+    private var cartItems: MutableList<CartItem>,
+    private val updateTotal: () -> Unit,
+) : RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CartViewHolder {
+        val view =
+            LayoutInflater
+                .from(parent.context)
+                .inflate(R.layout.item_cart, parent, false)
         return CartViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CartViewHolder,
+        position: Int,
+    ) {
         val item = cartItems[position]
 
         holder.name.text = item.name
         holder.price.text = "£${"%.2f".format(item.totalPrice)}"
         holder.quantity.text = item.quantity.toString()
 
-        Glide.with(holder.itemView.context)
+        Glide
+            .with(holder.itemView.context)
             .load(item.imageUrl)
             .centerCrop()
             .into(holder.cartItemImage)
@@ -53,7 +62,9 @@ class CartAdapter(private var cartItems: MutableList<CartItem>, private val upda
         updateTotal()
     }
 
-    class CartViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class CartViewHolder(
+        view: View,
+    ) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.cartItemName)
         val cartItemImage: ImageView = view.findViewById(R.id.cartItemImage)
         val price: TextView = view.findViewById(R.id.cartItemPrice)

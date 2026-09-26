@@ -5,5 +5,4 @@ class User {
     val firstname: String = ""
     val email: String = ""
     val role: String = "admin" // "admin" or "customer"
-
 }

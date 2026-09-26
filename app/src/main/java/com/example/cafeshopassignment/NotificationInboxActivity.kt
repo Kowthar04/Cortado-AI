@@ -11,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class NotificationInboxActivity : AppCompatActivity() {
-
     private lateinit var db: FirebaseFirestore
     private lateinit var adapter: AdminNotificationAdapter
     private val notificationList = mutableListOf<Notification>()
@@ -28,7 +27,6 @@ class NotificationInboxActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener {
             finish()
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-
         }
 
         db = FirebaseFirestore.getInstance()
@@ -45,7 +43,8 @@ class NotificationInboxActivity : AppCompatActivity() {
     private fun loadNotifications() {
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
 
-        db.collection("notifications")
+        db
+            .collection("notifications")
             .whereEqualTo("recipientId", currentUser.uid)
             .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .get()
@@ -56,9 +55,7 @@ class NotificationInboxActivity : AppCompatActivity() {
                     notificationList.add(note)
                 }
                 adapter.notifyDataSetChanged()
-
-            }
-            .addOnFailureListener {
+            }.addOnFailureListener {
                 Toast.makeText(this, "Failed to load notifications: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }

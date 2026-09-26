@@ -2,7 +2,6 @@ package com.example.cafeshopassignment
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -12,10 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.adapters.CartAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.*
 
 class CartActivity : AppCompatActivity() {
-
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
@@ -59,6 +56,3 @@ class CartActivity : AppCompatActivity() {
         }
     }
 }
-
-
-

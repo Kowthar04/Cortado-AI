@@ -10,7 +10,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class AdminLoginActivity : AppCompatActivity() {
-
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
@@ -40,7 +39,8 @@ class AdminLoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            auth.signInWithEmailAndPassword(email, password)
+            auth
+                .signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val uid = auth.currentUser?.uid
@@ -49,7 +49,9 @@ class AdminLoginActivity : AppCompatActivity() {
                             return@addOnCompleteListener
                         }
 
-                        db.collection("users").document(uid)
+                        db
+                            .collection("users")
+                            .document(uid)
                             .get()
                             .addOnSuccessListener { doc ->
                                 if (doc != null && doc.exists()) {
@@ -63,18 +65,17 @@ class AdminLoginActivity : AppCompatActivity() {
                                     } else {
                                         Toast.makeText(this, "Access denied: Not an admin", Toast.LENGTH_SHORT).show()
                                         auth.signOut()
-                                    CartManager.clear()
+                                        CartManager.clear()
                                     }
                                 } else {
                                     Toast.makeText(this, "User record not found in Firestore", Toast.LENGTH_SHORT).show()
                                     auth.signOut()
                                     CartManager.clear()
                                 }
-                            }
-                            .addOnFailureListener { e ->
+                            }.addOnFailureListener { e ->
                                 Toast.makeText(this, "Error getting role: ${e.message}", Toast.LENGTH_SHORT).show()
                                 auth.signOut()
-                                    CartManager.clear()
+                                CartManager.clear()
                             }
                     } else {
                         Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
@@ -83,14 +84,3 @@ class AdminLoginActivity : AppCompatActivity() {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-

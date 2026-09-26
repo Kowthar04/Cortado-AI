@@ -14,10 +14,11 @@ import java.util.Locale
 
 class ReviewAdapter(
     private val reviewList: MutableList<Review>,
-    private val onReplyClick: (Review) -> Unit
+    private val onReplyClick: (Review) -> Unit,
 ) : RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>() {
-
-    inner class ReviewViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class ReviewViewHolder(
+        view: View,
+    ) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.reviewCustomerName)
         val ratingBar: RatingBar = view.findViewById(R.id.reviewRating)
         val comment: TextView = view.findViewById(R.id.reviewComment)
@@ -25,13 +26,21 @@ class ReviewAdapter(
         val replyButton: Button = view.findViewById(R.id.replyButton)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_review_admin, parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ReviewViewHolder {
+        val view =
+            LayoutInflater
+                .from(parent.context)
+                .inflate(R.layout.item_review_admin, parent, false)
         return ReviewViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ReviewViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ReviewViewHolder,
+        position: Int,
+    ) {
         val review = reviewList[position]
 
         holder.name.text = "From: ${review.customerName}"
@@ -39,8 +48,9 @@ class ReviewAdapter(
         holder.comment.text = review.comment
 
         review.createdAt.let {
-            val formatted = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
-                .format(it.toDate())
+            val formatted =
+                SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
+                    .format(it.toDate())
             holder.date.text = formatted
         }
 

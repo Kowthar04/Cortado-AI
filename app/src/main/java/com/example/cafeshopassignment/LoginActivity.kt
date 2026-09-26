@@ -2,7 +2,6 @@ package com.example.cafeshopassignment
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -10,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
-
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,12 +36,10 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-
-            auth.signInWithEmailAndPassword(email, password)
+            auth
+                .signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-
-                        Log.d("LoginActivity", "Login successful, redirecting to MenuActivity")
                         runOnUiThread {
                             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
                             startActivity(Intent(this, MenuActivity::class.java))
@@ -55,7 +51,6 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
         registerRedirect.setOnClickListener {
-
             startActivity(Intent(this, RegisterActivity::class.java))
         }
     }

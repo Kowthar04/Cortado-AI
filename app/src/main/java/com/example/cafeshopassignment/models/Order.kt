@@ -12,5 +12,5 @@ data class Order(
     val discount: Double = 0.0,
     val totalPrice: Double = 0.0,
     val status: String = "Pending",
-    val createdAt: Timestamp? = null
+    val createdAt: Timestamp? = null,
 )

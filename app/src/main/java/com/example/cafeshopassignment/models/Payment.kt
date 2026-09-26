@@ -2,7 +2,7 @@ package com.example.cafeshopassignment.models
 
 import com.google.firebase.Timestamp
 
-data class Payment (
+data class Payment(
     val id: String = "",
     val orderId: String = "",
     val userId: String = "",
@@ -12,4 +12,5 @@ data class Payment (
     val paymentStatus: String = "Completed",
     val promoApplied: Boolean = false,
     val discountAmount: Double = 0.0,
-    val createdAt: Timestamp? = null  )
+    val createdAt: Timestamp? = null,
+)

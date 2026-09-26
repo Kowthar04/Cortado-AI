@@ -6,12 +6,11 @@ import android.widget.EditText
 import android.widget.RatingBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.Timestamp
 
 class ReviewActivity : AppCompatActivity() {
-
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
@@ -19,7 +18,6 @@ class ReviewActivity : AppCompatActivity() {
     private lateinit var commentInput: EditText
     private lateinit var submitReviewButton: Button
     private var orderId: String = ""
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,44 +51,48 @@ class ReviewActivity : AppCompatActivity() {
             return
         }
 
-        val currentUser = auth.currentUser ?: run {
-            Toast.makeText(this, "Please log in to leave a review", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val currentUser =
+            auth.currentUser ?: run {
+                Toast.makeText(this, "Please log in to leave a review", Toast.LENGTH_SHORT).show()
+                return
+            }
 
         val userId = currentUser.uid
 
-
-        db.collection("users").document(userId).get()
+        db
+            .collection("users")
+            .document(userId)
+            .get()
             .addOnSuccessListener { doc ->
                 val first = doc.getString("firstname") ?: ""
                 val last = doc.getString("surname") ?: ""
 
-                val customerFullName = "$first $last".trim()
-                    .ifBlank { currentUser.email?.substringBefore("@") ?: "Customer" }
+                val customerFullName =
+                    "$first $last"
+                        .trim()
+                        .ifBlank { currentUser.email?.substringBefore("@") ?: "Customer" }
 
-                val reviewData = hashMapOf(
-                    "orderId" to orderId,
-                    "customerId" to userId,
-                    "customerName" to customerFullName,
-                    "rating" to ratingValue,
-                    "comment" to commentText,
-                    "createdAt" to Timestamp.now()
-                )
+                val reviewData =
+                    hashMapOf(
+                        "orderId" to orderId,
+                        "customerId" to userId,
+                        "customerName" to customerFullName,
+                        "rating" to ratingValue,
+                        "comment" to commentText,
+                        "createdAt" to Timestamp.now(),
+                    )
 
-                db.collection("reviews")
+                db
+                    .collection("reviews")
                     .add(reviewData)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Review submitted!", Toast.LENGTH_SHORT).show()
                         finish()
-                    }
-                    .addOnFailureListener { e ->
+                    }.addOnFailureListener { e ->
                         Toast.makeText(this, "Failed to submit review: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-            }
-            .addOnFailureListener { e ->
+            }.addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to load your profile: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
 }

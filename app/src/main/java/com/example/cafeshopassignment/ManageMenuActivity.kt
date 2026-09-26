@@ -12,7 +12,6 @@ import com.example.cafeshopassignment.models.MenuItem
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ManageMenuActivity : AppCompatActivity() {
-
     private lateinit var db: FirebaseFirestore
 
     private lateinit var drinksRecycler: RecyclerView
@@ -77,33 +76,35 @@ class ManageMenuActivity : AppCompatActivity() {
     private fun loadCategory(
         category: String,
         list: MutableList<MenuItem>,
-        adapter: AdminMenuAdapter
+        adapter: AdminMenuAdapter,
     ) {
-        db.collection("menuItems")
+        db
+            .collection("menuItems")
             .whereEqualTo("category", category)
             .get()
             .addOnSuccessListener { result ->
                 list.clear()
                 for (doc in result) {
                     val priceAny = doc.get("price")
-                    val price = when (priceAny) {
-                        is Number -> priceAny.toDouble()
-                        is String -> priceAny.toDoubleOrNull() ?: 0.0
-                        else -> 0.0
-                    }
+                    val price =
+                        when (priceAny) {
+                            is Number -> priceAny.toDouble()
+                            is String -> priceAny.toDoubleOrNull() ?: 0.0
+                            else -> 0.0
+                        }
 
-                    val item = MenuItem(
-                        id = doc.id,
-                        name = doc.getString("name") ?: "",
-                        category = category,
-                        price = price,
-                        availability = doc.getBoolean("availability") ?: true
-                    )
+                    val item =
+                        MenuItem(
+                            id = doc.id,
+                            name = doc.getString("name") ?: "",
+                            category = category,
+                            price = price,
+                            availability = doc.getBoolean("availability") ?: true,
+                        )
                     list.add(item)
                 }
                 adapter.notifyDataSetChanged()
-            }
-            .addOnFailureListener {
+            }.addOnFailureListener {
                 Toast.makeText(this, "Failed to load $category", Toast.LENGTH_SHORT).show()
             }
     }
@@ -115,7 +116,8 @@ class ManageMenuActivity : AppCompatActivity() {
         val priceInput = view.findViewById<EditText>(R.id.itemPriceInput)
         val categoryInput = view.findViewById<EditText>(R.id.itemCategoryInput)
 
-        AlertDialog.Builder(this)
+        AlertDialog
+            .Builder(this)
             .setTitle("Add Menu Item")
             .setView(view)
             .setPositiveButton("Add") { _, _ ->
@@ -129,24 +131,24 @@ class ManageMenuActivity : AppCompatActivity() {
                     return@setPositiveButton
                 }
 
-                val newItem = MenuItem(
-                    name = name,
-                    price = price,
-                    category = category,
-                    availability = true
-                )
+                val newItem =
+                    MenuItem(
+                        name = name,
+                        price = price,
+                        category = category,
+                        availability = true,
+                    )
 
-                db.collection("menuItems")
+                db
+                    .collection("menuItems")
                     .add(newItem)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Item added!", Toast.LENGTH_SHORT).show()
                         loadAllCategories()
-                    }
-                    .addOnFailureListener { e ->
+                    }.addOnFailureListener { e ->
                         Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-            }
-            .setNegativeButton("Cancel", null)
+            }.setNegativeButton("Cancel", null)
             .show()
     }
 
@@ -161,7 +163,8 @@ class ManageMenuActivity : AppCompatActivity() {
         priceInput.setText(item.price.toString())
         categoryInput.setText(item.category)
 
-        AlertDialog.Builder(this)
+        AlertDialog
+            .Builder(this)
             .setTitle("Edit Item")
             .setView(view)
             .setPositiveButton("Save") { _, _ ->
@@ -174,28 +177,30 @@ class ManageMenuActivity : AppCompatActivity() {
                     return@setPositiveButton
                 }
 
-                val updatedData = mapOf(
-                    "name" to name,
-                    "price" to price,
-                    "category" to category,
-                )
+                val updatedData =
+                    mapOf(
+                        "name" to name,
+                        "price" to price,
+                        "category" to category,
+                    )
 
-                db.collection("menuItems").document(itemId)
+                db
+                    .collection("menuItems")
+                    .document(itemId)
                     .update(updatedData)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Updated!", Toast.LENGTH_SHORT).show()
                         loadAllCategories()
-                    }
-                    .addOnFailureListener { e ->
+                    }.addOnFailureListener { e ->
                         Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-            }
-            .setNegativeButton("Cancel", null)
+            }.setNegativeButton("Cancel", null)
             .show()
     }
 
     private fun deleteItem(item: MenuItem) {
-        AlertDialog.Builder(this)
+        AlertDialog
+            .Builder(this)
             .setTitle("Delete Item")
             .setMessage("Remove ${item.name}?")
             .setPositiveButton("Delete") { _, _ ->
@@ -204,17 +209,17 @@ class ManageMenuActivity : AppCompatActivity() {
                     Toast.makeText(this, "Cannot delete: item has no ID", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
-                db.collection("menuItems").document(itemId)
+                db
+                    .collection("menuItems")
+                    .document(itemId)
                     .delete()
                     .addOnSuccessListener {
                         Toast.makeText(this, "Deleted!", Toast.LENGTH_SHORT).show()
                         loadAllCategories()
-                    }
-                    .addOnFailureListener { e ->
+                    }.addOnFailureListener { e ->
                         Toast.makeText(this, "Delete failed: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-            }
-            .setNegativeButton("Cancel", null)
+            }.setNegativeButton("Cancel", null)
             .show()
     }
 }
