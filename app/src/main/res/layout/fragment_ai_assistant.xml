@@ -14,8 +14,10 @@
         android:background="@color/coffee_brown"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="16dp">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
         <ImageView
             android:layout_width="28dp"
@@ -66,8 +68,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp" />
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
 
         <LinearLayout
             android:id="@+id/chatEmptyState"
@@ -117,7 +121,8 @@
         <com.google.android.material.chip.ChipGroup
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="12dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             app:singleLine="true">
 
             <com.google.android.material.chip.Chip
@@ -156,7 +161,8 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="12dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:paddingTop="8dp">
 
         <EditText
@@ -170,8 +176,10 @@
             android:imeOptions="actionSend"
             android:inputType="textCapSentences|textShortMessage"
             android:minHeight="48dp"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="10dp"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:textColor="@color/dark_coffee"
             android:textColorHint="@color/medium_gray" />
 

@@ -44,7 +44,7 @@
     <string name="payment_pay_now">Pay Now</string>
     <string name="payment_processing">Processing…</string>
     <string name="payment_promo_empty">Enter a promo code first</string>
-    <string name="payment_promo_applied">Promo code applied: 20% off!</string>
+    <string name="payment_promo_applied" formatted="false">Promo code applied: 20% off!</string>
     <string name="payment_promo_invalid">Invalid promo code</string>
     <string name="payment_select_method">Please select a payment method</string>
     <string name="payment_failed">Payment failed: %1$s</string>

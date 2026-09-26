@@ -13,8 +13,10 @@
         android:layout_marginEnd="48dp"
         android:layout_marginBottom="4dp"
         android:background="@drawable/bg_chat_bubble_assistant"
-        android:paddingHorizontal="14dp"
-        android:paddingVertical="10dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:textColor="@color/dark_coffee"
         android:textSize="15sp" />
 </FrameLayout>

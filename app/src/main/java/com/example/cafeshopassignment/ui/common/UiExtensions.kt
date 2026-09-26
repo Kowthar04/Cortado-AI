@@ -34,7 +34,9 @@ fun Context.toast(
     @StringRes resId: Int,
     vararg args: Any,
 ) {
-    toast(getString(resId, *args))
+    // getString(id, *args) always runs String.format, which would choke on a literal "%"
+    // (e.g. "20% off") when there is nothing to substitute.
+    toast(if (args.isEmpty()) getString(resId) else getString(resId, *args))
 }
 
 /** Formats an amount as pounds, e.g. "£3.50". */
