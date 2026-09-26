@@ -122,6 +122,28 @@
     <string name="reviews_reply_sent">Reply sent!</string>
     <string name="reviews_reply_failed">Failed to send reply: %1$s</string>
 
+    <!-- AI order assistant -->
+    <string name="chat_fab">Ask AI</string>
+    <string name="chat_open">Open the AI order assistant</string>
+    <string name="chat_title">Ask AI</string>
+    <string name="chat_subtitle">Your café assistant, powered by Claude</string>
+    <string name="chat_empty_title">Hi! How can I help?</string>
+    <string name="chat_empty_body">Ask about the menu, get a recommendation, customise your order or check on an order.</string>
+    <string name="chat_input_hint">Ask about the menu or your order…</string>
+    <string name="chat_send">Send</string>
+    <string name="chat_typing">Assistant is typing…</string>
+    <string name="chat_suggestion_menu">What\'s on the menu?</string>
+    <string name="chat_suggestion_recommend">Recommend something sweet</string>
+    <string name="chat_suggestion_customise">Can I get my latte with oat milk?</string>
+    <string name="chat_suggestion_order_status">Where\'s my latest order?</string>
+    <string name="chat_error_with_retry">%1$s Tap to retry.</string>
+    <string name="chat_error_network">Can\'t reach the assistant. Check your connection (and that the backend is running).</string>
+    <string name="chat_error_unauthorized">Your session has expired. Please log in again.</string>
+    <string name="chat_error_rate_limited">The assistant is busy right now. Please wait a moment.</string>
+    <string name="chat_error_server">The assistant hit a problem on our side.</string>
+    <string name="chat_error_empty">The assistant didn\'t send a reply.</string>
+    <string name="chat_error_unknown">Something went wrong.</string>
+
     <!-- Notifications -->
     <string name="inbox_load_failed">Failed to load notifications: %1$s</string>
     <string name="send_missing_fields">Please fill in the title and message</string>

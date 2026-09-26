@@ -2,6 +2,7 @@ package com.example.cafeshopassignment
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -10,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.adapters.CartAdapter
+import com.example.cafeshopassignment.ui.assistant.AiAssistantBottomSheet
 import com.example.cafeshopassignment.ui.cart.CartEvent
 import com.example.cafeshopassignment.ui.cart.CartViewModel
 import com.example.cafeshopassignment.ui.common.collectWhileStarted
@@ -34,6 +36,7 @@ class CartActivity : AppCompatActivity() {
         }
 
         placeOrderButton.setOnClickListener { viewModel.checkout() }
+        findViewById<View>(R.id.askAiFab).setOnClickListener { AiAssistantBottomSheet.show(supportFragmentManager) }
 
         collectWhileStarted(viewModel.uiState) { state ->
             cartAdapter.submitList(state.items)

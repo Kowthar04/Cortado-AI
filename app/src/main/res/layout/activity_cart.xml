@@ -51,7 +51,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="16dp" />
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="88dp" />
 
         <TextView
             android:id="@+id/cartEmptyText"
@@ -64,6 +66,19 @@
             android:textColor="@color/dark_gray"
             android:textSize="16sp"
             android:visibility="gone" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/askAiFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/chat_open"
+            android:text="@string/chat_fab"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/coffee_brown"
+            app:icon="@drawable/ic_ai_sparkle"
+            app:iconTint="@color/white"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp" />
     </FrameLayout>
 
     <com.google.android.material.card.MaterialCardView

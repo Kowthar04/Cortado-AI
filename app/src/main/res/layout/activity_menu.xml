@@ -138,7 +138,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingTop="20dp"
-        android:paddingBottom="20dp"
+        android:paddingBottom="88dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:clipToPadding="false"
@@ -172,6 +172,21 @@
         app:layout_constraintBottom_toBottomOf="@id/menuRecyclerView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/askAiFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/chat_open"
+        android:text="@string/chat_fab"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/coffee_brown"
+        app:icon="@drawable/ic_ai_sparkle"
+        app:iconTint="@color/white"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/logoutButton" />
 
     <Button
         android:id="@+id/logoutButton"

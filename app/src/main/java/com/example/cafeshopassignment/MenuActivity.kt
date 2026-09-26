@@ -2,6 +2,7 @@ package com.example.cafeshopassignment
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ProgressBar
@@ -13,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.adapters.MenuAdapter
+import com.example.cafeshopassignment.ui.assistant.AiAssistantBottomSheet
 import com.example.cafeshopassignment.ui.common.collectWhileStarted
 import com.example.cafeshopassignment.ui.common.toast
 import com.example.cafeshopassignment.ui.menu.MenuEvent
@@ -51,6 +53,7 @@ class MenuActivity : AppCompatActivity() {
             startActivity(Intent(this, CartActivity::class.java))
         }
         findViewById<Button>(R.id.logoutButton).setOnClickListener { viewModel.logout() }
+        findViewById<View>(R.id.askAiFab).setOnClickListener { AiAssistantBottomSheet.show(supportFragmentManager) }
         emptyText.setOnClickListener { if (viewModel.uiState.value.loadError != null) viewModel.loadMenu() }
 
         menuAdapter = MenuAdapter { menuItem -> viewModel.addToCart(menuItem) }
