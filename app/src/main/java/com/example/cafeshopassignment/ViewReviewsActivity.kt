@@ -44,7 +44,8 @@ class ViewReviewsActivity : AppCompatActivity() {
 
         recycler.adapter = adapter
 
-        loadReviews()
+        // Register the search listener once; reloads only refresh the data.
+        setupSearch()
     }
 
     override fun onResume() {
@@ -69,8 +70,6 @@ class ViewReviewsActivity : AppCompatActivity() {
 
                 reviewList.addAll(fullReviewList)
                 adapter.notifyDataSetChanged()
-
-                setupSearch()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to load reviews", Toast.LENGTH_SHORT).show()

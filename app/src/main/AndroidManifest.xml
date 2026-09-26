@@ -56,15 +56,15 @@
 
         <activity
             android:name=".AdminDashboardActivity"
-            android:exported="true" />
+            android:exported="false" />
 
         <activity
             android:name=".ManageMenuActivity"
-            android:exported="true" />
+            android:exported="false" />
 
         <activity
             android:name=".ViewOrdersActivity"
-            android:exported="true" />
+            android:exported="false" />
 
         <activity
             android:name=".ViewReviewsActivity"

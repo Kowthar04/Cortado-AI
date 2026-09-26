@@ -53,7 +53,10 @@ class ReviewActivity : AppCompatActivity() {
             return
         }
 
-        val currentUser = auth.currentUser ?: return
+        val currentUser = auth.currentUser ?: run {
+            Toast.makeText(this, "Please log in to leave a review", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val userId = currentUser.uid
 
@@ -84,6 +87,9 @@ class ReviewActivity : AppCompatActivity() {
                     .addOnFailureListener { e ->
                         Toast.makeText(this, "Failed to submit review: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to load your profile: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 

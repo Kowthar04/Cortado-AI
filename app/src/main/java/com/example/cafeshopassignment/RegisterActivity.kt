@@ -45,7 +45,8 @@ class RegisterActivity : AppCompatActivity() {
 
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
+                    val uid = task.result?.user?.uid
+                    if (task.isSuccessful && uid != null) {
 
                         val user = hashMapOf(
                             "firstname" to firstname,
@@ -55,7 +56,7 @@ class RegisterActivity : AppCompatActivity() {
                         )
 
                         db.collection("users")
-                            .document(auth.currentUser!!.uid)
+                            .document(uid)
                             .set(user)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()

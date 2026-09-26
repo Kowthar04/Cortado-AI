@@ -63,15 +63,18 @@ class AdminLoginActivity : AppCompatActivity() {
                                     } else {
                                         Toast.makeText(this, "Access denied: Not an admin", Toast.LENGTH_SHORT).show()
                                         auth.signOut()
+                                    CartManager.clear()
                                     }
                                 } else {
                                     Toast.makeText(this, "User record not found in Firestore", Toast.LENGTH_SHORT).show()
                                     auth.signOut()
+                                    CartManager.clear()
                                 }
                             }
                             .addOnFailureListener { e ->
                                 Toast.makeText(this, "Error getting role: ${e.message}", Toast.LENGTH_SHORT).show()
                                 auth.signOut()
+                                    CartManager.clear()
                             }
                     } else {
                         Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()

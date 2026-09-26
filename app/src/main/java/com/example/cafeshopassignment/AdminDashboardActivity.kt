@@ -86,11 +86,9 @@ class AdminDashboardActivity : AppCompatActivity() {
             }
 
 
-        loadRecentOrders()
-        loadDashboardAnalytics()
-
         logoutButton.setOnClickListener {
             auth.signOut()
+            CartManager.clear()
             Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -107,13 +105,14 @@ class AdminDashboardActivity : AppCompatActivity() {
 
     private fun loadRecentOrders() {
         val container = findViewById<LinearLayout>(R.id.ordersPreviewContainer)
-        container.removeAllViews()
 
         db.collection("orders")
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .limit(4)
             .get()
             .addOnSuccessListener { result ->
+                // Clear when results arrive so overlapping loads can't duplicate rows.
+                container.removeAllViews()
                 if (result.isEmpty) {
                     val emptyText = TextView(this).apply {
                         text = "No recent orders."
@@ -170,6 +169,7 @@ class AdminDashboardActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener {
+                container.removeAllViews()
                 val errorText = TextView(this).apply {
                     text = "Failed to load orders."
                     setTextColor(Color.RED)
@@ -190,6 +190,9 @@ class AdminDashboardActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { snapshot ->
                 findViewById<TextView>(R.id.valueTotalUsers).text = snapshot.size().toString()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to load user count: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -218,6 +221,9 @@ class AdminDashboardActivity : AppCompatActivity() {
 
                 findViewById<TextView>(R.id.valueOrdersToday).text = docs.size().toString()
                 findViewById<TextView>(R.id.valueRevenueToday).text = "£%.2f".format(revenue)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to load today's orders: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 

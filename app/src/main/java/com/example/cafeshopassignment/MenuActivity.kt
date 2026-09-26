@@ -25,10 +25,6 @@ class MenuActivity : AppCompatActivity() {
     private lateinit var menuRecyclerView: RecyclerView
     private lateinit var menuAdapter: MenuAdapter
 
-    private lateinit var adapter: MenuAdapter
-
-    private val fullMenuList = mutableListOf<MenuItem>()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,6 +97,7 @@ class MenuActivity : AppCompatActivity() {
 
         logoutButton.setOnClickListener {
             auth.signOut()
+            CartManager.clear()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }

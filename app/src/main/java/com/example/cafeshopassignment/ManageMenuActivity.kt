@@ -165,14 +165,22 @@ class ManageMenuActivity : AppCompatActivity() {
             .setTitle("Edit Item")
             .setView(view)
             .setPositiveButton("Save") { _, _ ->
+                val itemId = item.id
+                val name = nameInput.text.toString().trim()
+                val price = priceInput.text.toString().toDoubleOrNull()
+                val category = categoryInput.text.toString().trim()
+                if (itemId.isNullOrBlank() || name.isEmpty() || price == null || category.isEmpty()) {
+                    Toast.makeText(this, "Fill all fields correctly", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
 
                 val updatedData = mapOf(
-                    "name" to nameInput.text.toString().trim(),
-                    "price" to priceInput.text.toString().toDoubleOrNull(),
-                    "category" to categoryInput.text.toString().trim(),
+                    "name" to name,
+                    "price" to price,
+                    "category" to category,
                 )
 
-                db.collection("menuItems").document(item.id!!)
+                db.collection("menuItems").document(itemId)
                     .update(updatedData)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Updated!", Toast.LENGTH_SHORT).show()
@@ -191,11 +199,19 @@ class ManageMenuActivity : AppCompatActivity() {
             .setTitle("Delete Item")
             .setMessage("Remove ${item.name}?")
             .setPositiveButton("Delete") { _, _ ->
-                db.collection("menuItems").document(item.id!!)
+                val itemId = item.id
+                if (itemId.isNullOrBlank()) {
+                    Toast.makeText(this, "Cannot delete: item has no ID", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                db.collection("menuItems").document(itemId)
                     .delete()
                     .addOnSuccessListener {
                         Toast.makeText(this, "Deleted!", Toast.LENGTH_SHORT).show()
                         loadAllCategories()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Delete failed: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             }
             .setNegativeButton("Cancel", null)

@@ -68,8 +68,8 @@ class SendNotificationActivity : AppCompatActivity() {
 
     private fun sendNotificationToUser(recipientId: String, title: String, message: String) {
         val notificationData = hashMapOf(
-            "title" to titleInput.text.toString(),
-            "message" to messageInput.text.toString(),
+            "title" to title,
+            "message" to message,
             "recipientId" to recipientId,
             "notificationId" to UUID.randomUUID().toString(),
             "isRead" to false,
