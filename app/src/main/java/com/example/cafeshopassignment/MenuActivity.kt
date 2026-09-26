@@ -4,131 +4,104 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.adapters.MenuAdapter
-import com.example.cafeshopassignment.models.MenuItem
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.toast
+import com.example.cafeshopassignment.ui.menu.MenuEvent
+import com.example.cafeshopassignment.ui.menu.MenuUiState
+import com.example.cafeshopassignment.ui.menu.MenuViewModel
 import com.google.android.material.tabs.TabLayout
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 
 class MenuActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
-    private lateinit var menuRecyclerView: RecyclerView
+    private val viewModel: MenuViewModel by viewModels { MenuViewModel.Factory }
+
     private lateinit var menuAdapter: MenuAdapter
+    private lateinit var welcomeText: TextView
+    private lateinit var categoryTabs: TabLayout
+    private lateinit var progress: ProgressBar
+    private lateinit var emptyText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
+        welcomeText = findViewById(R.id.welcomeText)
+        categoryTabs = findViewById(R.id.categoryTabs)
+        progress = findViewById(R.id.menuProgress)
+        emptyText = findViewById(R.id.menuEmptyText)
 
-        val welcomeText = findViewById<TextView>(R.id.welcomeText)
-        val logoutButton = findViewById<Button>(R.id.logoutButton)
-        val categoryTabs = findViewById<TabLayout>(R.id.categoryTabs)
-        val mailButton = findViewById<ImageButton>(R.id.mailButton)
-        val cartButton = findViewById<ImageButton>(R.id.cartButton)
-
-        mailButton.setOnClickListener {
+        findViewById<ImageButton>(R.id.mailButton).setOnClickListener {
             startActivity(Intent(this, NotificationInboxActivity::class.java))
         }
-
-        cartButton.setOnClickListener {
+        findViewById<ImageButton>(R.id.ordersButton).setOnClickListener {
+            startActivity(Intent(this, ViewOrdersActivity::class.java))
+        }
+        findViewById<ImageButton>(R.id.cartButton).setOnClickListener {
             startActivity(Intent(this, CartActivity::class.java))
         }
+        findViewById<Button>(R.id.logoutButton).setOnClickListener { viewModel.logout() }
+        emptyText.setOnClickListener { if (viewModel.uiState.value.loadError != null) viewModel.loadMenu() }
 
-        menuRecyclerView = findViewById(R.id.menuRecyclerView)
-        menuRecyclerView.layoutManager = LinearLayoutManager(this)
+        menuAdapter = MenuAdapter { menuItem -> viewModel.addToCart(menuItem) }
+        findViewById<RecyclerView>(R.id.menuRecyclerView).apply {
+            layoutManager = LinearLayoutManager(this@MenuActivity)
+            adapter = menuAdapter
+        }
 
-        menuAdapter =
-            MenuAdapter(emptyList()) { menuItem ->
-                CartManager.addItem(menuItem)
-                Toast.makeText(this, "${menuItem.name} added to cart!", Toast.LENGTH_SHORT).show()
-            }
-        menuRecyclerView.adapter = menuAdapter
-
-        val categories = listOf("Drinks", "Breakfast", "Lunch", "Pastries & Sweets")
-        categories.forEach { categoryTabs.addTab(categoryTabs.newTab().setText(it)) }
-
-        loadMenuItems(categories[0])
-
+        val state = viewModel.uiState.value
+        state.categories.forEach { category ->
+            val tab = categoryTabs.newTab().setText(category).setTag(category)
+            categoryTabs.addTab(tab, category == state.selectedCategory)
+        }
         categoryTabs.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
-                    loadMenuItems(tab.text.toString())
+                    (tab.tag as? String)?.let(viewModel::selectCategory)
                 }
 
-                override fun onTabUnselected(tab: TabLayout.Tab) {}
+                override fun onTabUnselected(tab: TabLayout.Tab) = Unit
 
-                override fun onTabReselected(tab: TabLayout.Tab) {}
+                override fun onTabReselected(tab: TabLayout.Tab) = Unit
             },
         )
 
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            val uid = currentUser.uid
-            db
-                .collection("users")
-                .document(uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    val firstName = document.getString("firstname") ?: "Customer"
-                    welcomeText.text = "Welcome, $firstName!"
-                }.addOnFailureListener {
-                    welcomeText.text = "Welcome!"
+        collectWhileStarted(viewModel.uiState, ::render)
+        collectWhileStarted(viewModel.events) { event ->
+            when (event) {
+                is MenuEvent.AddedToCart -> toast(R.string.menu_added_to_cart, event.itemName)
+                MenuEvent.LoggedOut -> {
+                    startActivity(
+                        Intent(this, LoginActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        },
+                    )
+                    finish()
                 }
-        }
-
-        logoutButton.setOnClickListener {
-            auth.signOut()
-            CartManager.clear()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+            }
         }
     }
 
-    private fun loadMenuItems(category: String) {
-        db
-            .collection("menuItems")
-            .whereEqualTo("category", category)
-            .get()
-            .addOnSuccessListener { documents ->
-                val menuList =
-                    documents.map { doc ->
-                        val priceAny = doc.get("price")
-                        val price =
-                            when (priceAny) {
-                                is Number -> priceAny.toDouble()
-                                is String -> priceAny.toDoubleOrNull() ?: 0.0
-                                else -> 0.0
-                            }
-
-                        MenuItem(
-                            id = doc.id,
-                            name = doc.getString("name") ?: "",
-                            category = doc.getString("category") ?: "",
-                            price = price,
-                            imageUrl = doc.getString("imageUrl") ?: "",
-                            availability = doc.getBoolean("availability") ?: true,
-                        )
-                    }
-
-                menuAdapter.updateData(menuList)
-
-                if (menuList.isEmpty()) {
-                    Toast.makeText(this, "No items in $category", Toast.LENGTH_SHORT).show()
-                }
-            }.addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to load menu: ${e.message}", Toast.LENGTH_SHORT).show()
+    private fun render(state: MenuUiState) {
+        welcomeText.text =
+            state.firstName?.let { getString(R.string.menu_welcome_name, it) } ?: getString(R.string.menu_welcome)
+        progress.isVisible = state.isLoading
+        menuAdapter.submitList(state.items)
+        emptyText.isVisible = state.loadError != null || state.isEmpty
+        emptyText.text =
+            when {
+                state.loadError != null -> getString(R.string.menu_load_failed)
+                else -> getString(R.string.menu_empty_category, state.selectedCategory)
             }
     }
 }

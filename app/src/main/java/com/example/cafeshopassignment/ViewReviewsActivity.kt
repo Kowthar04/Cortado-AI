@@ -1,158 +1,66 @@
 package com.example.cafeshopassignment
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.adapters.ReviewAdapter
 import com.example.cafeshopassignment.models.Review
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.toast
+import com.example.cafeshopassignment.ui.reviews.ViewReviewsEvent
+import com.example.cafeshopassignment.ui.reviews.ViewReviewsViewModel
 
 class ViewReviewsActivity : AppCompatActivity() {
-    private lateinit var db: FirebaseFirestore
-    private lateinit var adapter: ReviewAdapter
-
-    private val fullReviewList = mutableListOf<Review>()
-    private val reviewList = mutableListOf<Review>()
+    private val viewModel: ViewReviewsViewModel by viewModels { ViewReviewsViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_reviews)
 
-        findViewById<ImageButton>(R.id.backButtonFeedback).setOnClickListener {
-            finish()
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+        findViewById<ImageButton>(R.id.backButtonFeedback).setOnClickListener { finish() }
+
+        val reviewAdapter = ReviewAdapter(::showReplyDialog)
+        findViewById<RecyclerView>(R.id.reviewsRecyclerView).apply {
+            layoutManager = LinearLayoutManager(this@ViewReviewsActivity)
+            adapter = reviewAdapter
         }
 
-        db = FirebaseFirestore.getInstance()
+        // Registered once; reloading only refreshes the data behind the filter.
+        findViewById<EditText>(R.id.reviewSearchInput).doAfterTextChanged {
+            viewModel.setQuery(it?.toString().orEmpty())
+        }
 
-        val recycler = findViewById<RecyclerView>(R.id.reviewsRecyclerView)
-        recycler.layoutManager = LinearLayoutManager(this)
-
-        adapter =
-            ReviewAdapter(reviewList) { review ->
-                showReplyDialog(review)
+        collectWhileStarted(viewModel.uiState) { state ->
+            reviewAdapter.submitList(state.reviews)
+        }
+        collectWhileStarted(viewModel.events) { event ->
+            when (event) {
+                ViewReviewsEvent.EmptyReply -> toast(R.string.reviews_reply_empty)
+                ViewReviewsEvent.ReplySent -> toast(R.string.reviews_reply_sent)
+                is ViewReviewsEvent.ReplyFailed -> toast(R.string.reviews_reply_failed, event.detail.orEmpty())
             }
-
-        recycler.adapter = adapter
-
-        // Register the search listener once; reloads only refresh the data.
-        setupSearch()
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        loadReviews()
-    }
-
-    private fun loadReviews() {
-        db
-            .collection("reviews")
-            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { result ->
-                fullReviewList.clear()
-                reviewList.clear()
-
-                for (doc in result) {
-                    val review =
-                        doc
-                            .toObject(Review::class.java)
-                            .copy(reviewId = doc.id)
-
-                    fullReviewList.add(review)
-                }
-
-                reviewList.addAll(fullReviewList)
-                adapter.notifyDataSetChanged()
-            }.addOnFailureListener {
-                Toast.makeText(this, "Failed to load reviews", Toast.LENGTH_SHORT).show()
-            }
+    override fun onStart() {
+        super.onStart()
+        viewModel.load()
     }
 
     private fun showReplyDialog(review: Review) {
-        val input = EditText(this)
-        input.hint = "Write your reply…"
-
+        val input = EditText(this).apply { setHint(R.string.reviews_reply_hint) }
         AlertDialog
             .Builder(this)
-            .setTitle("Reply to Customer")
+            .setTitle(R.string.reviews_reply_title)
             .setView(input)
-            .setPositiveButton("Send") { _, _ ->
-                val reply = input.text.toString().trim()
-
-                if (reply.isNotEmpty()) {
-                    sendReply(review.customerId, reply)
-                } else {
-                    Toast.makeText(this, "Reply cannot be empty", Toast.LENGTH_SHORT).show()
-                }
-            }.setNegativeButton("Cancel", null)
+            .setPositiveButton(R.string.action_send) { _, _ -> viewModel.reply(review, input.text.toString()) }
+            .setNegativeButton(R.string.action_cancel, null)
             .show()
-    }
-
-    private fun sendReply(
-        userId: String,
-        message: String,
-    ) {
-        val notif =
-            hashMapOf(
-                "recipientId" to userId,
-                "title" to "Response to your review",
-                "message" to message,
-                "createdAt" to FieldValue.serverTimestamp(),
-                "isRead" to false,
-            )
-
-        db
-            .collection("notifications")
-            .add(notif)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Reply sent!", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener {
-                Toast.makeText(this, "Failed to send reply", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun setupSearch() {
-        val search = findViewById<EditText>(R.id.reviewSearchInput)
-
-        search.addTextChangedListener(
-            object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {}
-
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int,
-                ) {}
-
-                override fun onTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    before: Int,
-                    count: Int,
-                ) {
-                    val query = s.toString().lowercase()
-
-                    reviewList.clear()
-                    reviewList.addAll(
-                        fullReviewList.filter { review ->
-                            review.customerName.lowercase().contains(query) ||
-                                review.comment.lowercase().contains(query)
-                        },
-                    )
-
-                    adapter.notifyDataSetChanged()
-                }
-            },
-        )
     }
 }

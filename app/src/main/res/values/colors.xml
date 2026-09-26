@@ -20,4 +20,10 @@
 
     <!-- Success Color -->
     <color name="success_green">#4CAF50</color>
+
+    <!-- Order status badges -->
+    <color name="status_pending">#90A4AE</color>
+    <color name="status_preparing">#FF9800</color>
+    <color name="status_ready">#8B4513</color>
+    <color name="status_completed">#4CAF50</color>
 </resources>

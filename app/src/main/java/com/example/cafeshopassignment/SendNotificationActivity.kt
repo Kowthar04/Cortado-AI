@@ -4,104 +4,55 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import java.util.UUID
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.toast
+import com.example.cafeshopassignment.ui.notifications.SendNotificationEvent
+import com.example.cafeshopassignment.ui.notifications.SendNotificationViewModel
 
 class SendNotificationActivity : AppCompatActivity() {
-    private lateinit var db: FirebaseFirestore
-    private lateinit var titleInput: EditText
-    private lateinit var messageInput: EditText
-    private lateinit var recipientInput: EditText
-    private lateinit var sendButton: Button
-    private lateinit var sendToAllSwitch: SwitchCompat
+    private val viewModel: SendNotificationViewModel by viewModels { SendNotificationViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_send_notification)
 
-        val backButton = findViewById<ImageButton>(R.id.backButton)
-        backButton.setOnClickListener {
-            finish()
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-        }
+        findViewById<ImageButton>(R.id.backButton).setOnClickListener { finish() }
 
-        db = FirebaseFirestore.getInstance()
+        val titleInput = findViewById<EditText>(R.id.notificationTitleInput)
+        val messageInput = findViewById<EditText>(R.id.notificationMessageInput)
+        val recipientInput = findViewById<EditText>(R.id.notificationRecipientInput)
+        val sendToAllSwitch = findViewById<SwitchCompat>(R.id.sendToAllSwitch)
+        val sendButton = findViewById<Button>(R.id.sendNotificationButton)
 
-        titleInput = findViewById(R.id.notificationTitleInput)
-        messageInput = findViewById(R.id.notificationMessageInput)
-        recipientInput = findViewById(R.id.notificationRecipientInput)
-        sendButton = findViewById(R.id.sendNotificationButton)
-        sendToAllSwitch = findViewById(R.id.sendToAllSwitch)
-
+        sendToAllSwitch.setOnCheckedChangeListener { _, checked -> recipientInput.isEnabled = !checked }
         sendButton.setOnClickListener {
-            val title = titleInput.text.toString().trim()
-            val message = messageInput.text.toString().trim()
-            val recipientId = recipientInput.text.toString().trim()
-            val sendToAll = sendToAllSwitch.isChecked
+            viewModel.send(
+                title = titleInput.text.toString(),
+                message = messageInput.text.toString(),
+                recipientId = recipientInput.text.toString(),
+                sendToAll = sendToAllSwitch.isChecked,
+            )
+        }
 
-            if (title.isEmpty() || message.isEmpty()) {
-                Toast.makeText(this, "Please fill in the title and message", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (sendToAll) {
-                sendNotificationToAllUsers(title, message)
-            } else {
-                if (recipientId.isEmpty()) {
-                    Toast.makeText(this, "Please enter recipient UID or enable 'Send to All'", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
+        collectWhileStarted(viewModel.isSending) { sending -> sendButton.isEnabled = !sending }
+        collectWhileStarted(viewModel.events) { event ->
+            when (event) {
+                SendNotificationEvent.MissingTitleOrMessage -> toast(R.string.send_missing_fields)
+                SendNotificationEvent.MissingRecipient -> toast(R.string.send_missing_recipient)
+                SendNotificationEvent.SentToUser -> {
+                    toast(R.string.send_sent_to_user)
+                    titleInput.text.clear()
+                    messageInput.text.clear()
                 }
-                sendNotificationToUser(recipientId, title, message)
+                is SendNotificationEvent.SentToAll -> {
+                    toast(R.string.send_sent_to_all, event.count)
+                    finish()
+                }
+                is SendNotificationEvent.Failed -> toast(R.string.send_failed, event.detail.orEmpty())
             }
         }
-    }
-
-    private fun sendNotificationToUser(
-        recipientId: String,
-        title: String,
-        message: String,
-    ) {
-        val notificationData =
-            hashMapOf(
-                "title" to title,
-                "message" to message,
-                "recipientId" to recipientId,
-                "notificationId" to UUID.randomUUID().toString(),
-                "isRead" to false,
-                "createdAt" to FieldValue.serverTimestamp(),
-            )
-
-        db
-            .collection("notifications")
-            .add(notificationData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Notification sent to user!", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener {
-                Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun sendNotificationToAllUsers(
-        title: String,
-        message: String,
-    ) {
-        db
-            .collection("users")
-            .get()
-            .addOnSuccessListener { users ->
-                for (user in users) {
-                    val uid = user.id
-                    sendNotificationToUser(uid, title, message)
-                }
-
-                Toast.makeText(this, "Promo sent to all users!", Toast.LENGTH_LONG).show()
-                finish()
-            }.addOnFailureListener {
-                Toast.makeText(this, "Failed to load users: ${it.message}", Toast.LENGTH_SHORT).show()
-            }
     }
 }

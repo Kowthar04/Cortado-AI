@@ -1,235 +1,113 @@
 package com.example.cafeshopassignment
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Spinner
-import android.widget.Toast
+import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.cafeshopassignment.adapters.AdminOrderAdapter
+import com.example.cafeshopassignment.adapters.OrderAdapter
 import com.example.cafeshopassignment.models.Order
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.Query
+import com.example.cafeshopassignment.models.OrderStatus
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.toast
+import com.example.cafeshopassignment.ui.orders.OrdersError
+import com.example.cafeshopassignment.ui.orders.OrdersEvent
+import com.example.cafeshopassignment.ui.orders.OrdersUiState
+import com.example.cafeshopassignment.ui.orders.OrdersViewModel
 
+/**
+ * Orders list for both roles, updated in real time from a Firestore snapshot listener.
+ * Customers see their own orders (reached from the menu's receipt icon or the confirmation
+ * screen); admins see every order and can change its status.
+ */
 class ViewOrdersActivity : AppCompatActivity() {
-    private lateinit var db: FirebaseFirestore
-    private lateinit var adapter: AdminOrderAdapter
+    private val viewModel: OrdersViewModel by viewModels { OrdersViewModel.Factory }
 
-    private val orderList = mutableListOf<Order>() // filtered orders
-    private val fullOrderList = mutableListOf<Order>() // all orders
-
-    private val auth = FirebaseAuth.getInstance()
-
-    // Real-time listener; attached in onStart, removed in onStop so it never leaks.
-    private var ordersRegistration: ListenerRegistration? = null
-    private var isAdmin = false
+    private lateinit var orderAdapter: OrderAdapter
+    private lateinit var titleText: TextView
+    private lateinit var searchInput: EditText
+    private lateinit var emptyText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_orders)
 
-        findViewById<ImageButton>(R.id.backButtonOrders).setOnClickListener {
-            finish()
-            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+        findViewById<ImageButton>(R.id.backButtonOrders).setOnClickListener { finish() }
+
+        titleText = findViewById(R.id.ordersTitle)
+        searchInput = findViewById(R.id.orderSearchInput)
+        emptyText = findViewById(R.id.ordersEmptyText)
+
+        orderAdapter = OrderAdapter(::showStatusDialog)
+        findViewById<RecyclerView>(R.id.ordersRecyclerView).apply {
+            layoutManager = LinearLayoutManager(this@ViewOrdersActivity)
+            adapter = orderAdapter
         }
 
-        db = FirebaseFirestore.getInstance()
+        // Filter listeners are registered exactly once; they only push values into the ViewModel.
+        searchInput.doAfterTextChanged { viewModel.setQuery(it?.toString().orEmpty()) }
+        setUpStatusFilter(findViewById(R.id.orderStatusFilter))
 
-        val recyclerView = findViewById<RecyclerView>(R.id.ordersRecyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        adapter =
-            AdminOrderAdapter(orderList) { order ->
-                if (isAdmin) showStatusDialog(order)
+        collectWhileStarted(viewModel.uiState, ::render)
+        collectWhileStarted(viewModel.events) { event ->
+            when (event) {
+                is OrdersEvent.StatusUpdated -> toast(R.string.orders_status_updated, event.status.label)
+                is OrdersEvent.StatusUpdateFailed -> toast(R.string.orders_status_update_failed, event.detail.orEmpty())
             }
-
-        recyclerView.adapter = adapter
-
-        // Register filter listeners exactly once.
-        setupFilters()
+        }
     }
 
-    override fun onStart() {
-        super.onStart()
-        loadUserRoleAndOrders()
-    }
-
-    override fun onStop() {
-        ordersRegistration?.remove()
-        ordersRegistration = null
-        super.onStop()
-    }
-
-    private fun loadUserRoleAndOrders() {
-        val uid = auth.currentUser?.uid ?: return
-
-        db
-            .collection("users")
-            .document(uid)
-            .get()
-            .addOnSuccessListener { doc ->
-                val role = doc.getString("role") ?: "customer"
-                isAdmin = role == "admin"
-
-                val query =
-                    if (isAdmin) {
-                        db
-                            .collection("orders")
-                            .orderBy("createdAt", Query.Direction.DESCENDING)
-                    } else {
-                        db
-                            .collection("orders")
-                            .whereEqualTo("userId", uid)
-                            .orderBy("createdAt", Query.Direction.DESCENDING)
-                    }
-                listenToOrders(query)
-            }.addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to load your profile: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun listenToOrders(query: Query) {
-        ordersRegistration?.remove()
-        ordersRegistration =
-            query.addSnapshotListener { result, error ->
-                if (error != null) {
-                    Toast.makeText(this, "Failed to load orders", Toast.LENGTH_SHORT).show()
-                    return@addSnapshotListener
-                }
-                if (result == null) return@addSnapshotListener
-
-                fullOrderList.clear()
-                for (doc in result) {
-                    val order =
-                        doc.toObject(Order::class.java).copy(
-                            id = doc.id,
-                            customerName = doc.getString("customerName") ?: "Unknown",
-                        )
-                    fullOrderList.add(order)
-                }
-                filterOrders()
-            }
-    }
-
-    private fun showStatusDialog(order: Order) {
-        val statuses = arrayOf("Pending", "Preparing", "Ready for Collection", "Completed")
-
-        AlertDialog
-            .Builder(this)
-            .setTitle("Update Order Status")
-            .setItems(statuses) { _, which ->
-                val selected = statuses[which]
-
-                db
-                    .collection("orders")
-                    .document(order.id)
-                    .update("status", selected)
-                    .addOnSuccessListener {
-                        val notif =
-                            hashMapOf(
-                                "recipientId" to order.userId,
-                                "title" to "Order Status Update",
-                                "message" to "Your order is now $selected ☕",
-                                "createdAt" to FieldValue.serverTimestamp(),
-                                "isRead" to false,
-                            )
-
-                        db
-                            .collection("notifications")
-                            .add(notif)
-                            .addOnFailureListener { e ->
-                                Toast.makeText(this, "Customer notification failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-
-                        Toast.makeText(this, "Status updated", Toast.LENGTH_SHORT).show()
-                    }.addOnFailureListener { e ->
-                        Toast.makeText(this, "Status update failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-            }.show()
-    }
-
-    private fun setupFilters() {
-        val searchInput = findViewById<EditText>(R.id.orderSearchInput)
-        val statusFilter = findViewById<Spinner>(R.id.orderStatusFilter)
-
-        val statuses = listOf("All", "Pending", "Preparing", "Ready for Collection", "Completed")
-        statusFilter.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statuses)
-
-        searchInput.addTextChangedListener(
-            object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {}
-
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int,
-                ) {}
-
-                override fun onTextChanged(
-                    text: CharSequence?,
-                    start: Int,
-                    before: Int,
-                    count: Int,
-                ) {
-                    filterOrders()
-                }
-            },
-        )
-
-        statusFilter.onItemSelectedListener =
+    private fun setUpStatusFilter(spinner: Spinner) {
+        val options = listOf(getString(R.string.orders_filter_all)) + OrderStatus.labels
+        spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, options)
+        spinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>,
                     view: View?,
-                    pos: Int,
+                    position: Int,
                     id: Long,
                 ) {
-                    filterOrders()
+                    // Position 0 is "All"; the rest map 1:1 onto OrderStatus.entries.
+                    viewModel.setStatusFilter(OrderStatus.entries.getOrNull(position - 1))
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>) {}
+                override fun onNothingSelected(parent: AdapterView<*>) = Unit
             }
     }
 
-    private fun filterOrders() {
-        val query =
-            findViewById<EditText>(R.id.orderSearchInput)
-                .text
-                .toString()
-                .lowercase()
+    private fun render(state: OrdersUiState) {
+        titleText.setText(if (state.isAdmin) R.string.orders_title_admin else R.string.orders_title_customer)
+        searchInput.isVisible = state.isAdmin
+        orderAdapter.showAdminActions = state.isAdmin
+        orderAdapter.submitList(state.orders)
 
-        val selectedStatus =
-            findViewById<Spinner>(R.id.orderStatusFilter)
-                .selectedItem
-                ?.toString() ?: "All"
+        emptyText.isVisible = !state.isLoading && state.orders.isEmpty()
+        emptyText.text =
+            when (val error = state.error) {
+                OrdersError.NotSignedIn -> getString(R.string.error_not_logged_in)
+                is OrdersError.LoadFailed -> getString(R.string.orders_load_failed, error.detail.orEmpty())
+                null -> getString(if (state.totalCount == 0) R.string.orders_empty else R.string.orders_no_matches)
+            }
+    }
 
-        orderList.clear()
-
-        orderList.addAll(
-            fullOrderList.filter { order ->
-                val matchesSearch =
-                    order.customerName.lowercase().contains(query) ||
-                        order.userId.lowercase().contains(query)
-
-                val matchesStatus =
-                    selectedStatus == "All" || order.status == selectedStatus
-
-                matchesSearch && matchesStatus
-            },
-        )
-
-        adapter.notifyDataSetChanged()
+    private fun showStatusDialog(order: Order) {
+        val statuses = OrderStatus.entries
+        AlertDialog
+            .Builder(this)
+            .setTitle(R.string.orders_update_status_title)
+            .setItems(statuses.map { it.label }.toTypedArray()) { _, which ->
+                viewModel.updateStatus(order, statuses[which])
+            }.show()
     }
 }

@@ -4,95 +4,45 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RatingBar
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.toast
+import com.example.cafeshopassignment.ui.reviews.ReviewEvent
+import com.example.cafeshopassignment.ui.reviews.ReviewViewModel
 
 class ReviewActivity : AppCompatActivity() {
-    private lateinit var db: FirebaseFirestore
-    private lateinit var auth: FirebaseAuth
-
-    private lateinit var ratingBar: RatingBar
-    private lateinit var commentInput: EditText
-    private lateinit var submitReviewButton: Button
-    private var orderId: String = ""
+    private val viewModel: ReviewViewModel by viewModels { ReviewViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_review)
 
-        db = FirebaseFirestore.getInstance()
-        auth = FirebaseAuth.getInstance()
+        val orderId = intent.getStringExtra(EXTRA_ORDER_ID).orEmpty()
+        val ratingBar = findViewById<RatingBar>(R.id.ratingBar)
+        val commentInput = findViewById<EditText>(R.id.reviewInput)
+        val submitButton = findViewById<Button>(R.id.submitReviewBtn)
 
-        orderId = intent.getStringExtra("ORDER_ID") ?: ""
+        submitButton.setOnClickListener {
+            viewModel.submit(orderId, ratingBar.rating.toInt(), commentInput.text.toString())
+        }
 
-        ratingBar = findViewById(R.id.ratingBar)
-        commentInput = findViewById(R.id.reviewInput)
-        submitReviewButton = findViewById(R.id.submitReviewBtn)
-
-        submitReviewButton.setOnClickListener {
-            submitReview()
+        collectWhileStarted(viewModel.isSubmitting) { submitting -> submitButton.isEnabled = !submitting }
+        collectWhileStarted(viewModel.events) { event ->
+            when (event) {
+                ReviewEvent.MissingRating -> toast(R.string.review_missing_rating)
+                ReviewEvent.MissingComment -> toast(R.string.review_missing_comment)
+                ReviewEvent.NotLoggedIn -> toast(R.string.error_not_logged_in)
+                is ReviewEvent.Failed -> toast(R.string.review_failed, event.detail.orEmpty())
+                ReviewEvent.Submitted -> {
+                    toast(R.string.review_submitted)
+                    finish()
+                }
+            }
         }
     }
 
-    private fun submitReview() {
-        val ratingValue = ratingBar.rating.toInt()
-        val commentText = commentInput.text.toString().trim()
-
-        if (ratingValue == 0) {
-            Toast.makeText(this, "Please select a rating", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (commentText.isEmpty()) {
-            Toast.makeText(this, "Please write a comment", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val currentUser =
-            auth.currentUser ?: run {
-                Toast.makeText(this, "Please log in to leave a review", Toast.LENGTH_SHORT).show()
-                return
-            }
-
-        val userId = currentUser.uid
-
-        db
-            .collection("users")
-            .document(userId)
-            .get()
-            .addOnSuccessListener { doc ->
-                val first = doc.getString("firstname") ?: ""
-                val last = doc.getString("surname") ?: ""
-
-                val customerFullName =
-                    "$first $last"
-                        .trim()
-                        .ifBlank { currentUser.email?.substringBefore("@") ?: "Customer" }
-
-                val reviewData =
-                    hashMapOf(
-                        "orderId" to orderId,
-                        "customerId" to userId,
-                        "customerName" to customerFullName,
-                        "rating" to ratingValue,
-                        "comment" to commentText,
-                        "createdAt" to Timestamp.now(),
-                    )
-
-                db
-                    .collection("reviews")
-                    .add(reviewData)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Review submitted!", Toast.LENGTH_SHORT).show()
-                        finish()
-                    }.addOnFailureListener { e ->
-                        Toast.makeText(this, "Failed to submit review: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-            }.addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to load your profile: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+    companion object {
+        const val EXTRA_ORDER_ID = "ORDER_ID"
     }
 }

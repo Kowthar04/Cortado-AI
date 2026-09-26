@@ -4,55 +4,48 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.adapters.CartAdapter
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.cafeshopassignment.ui.cart.CartEvent
+import com.example.cafeshopassignment.ui.cart.CartViewModel
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.formatPrice
+import com.example.cafeshopassignment.ui.common.toast
 
 class CartActivity : AppCompatActivity() {
-    private lateinit var db: FirebaseFirestore
-    private lateinit var auth: FirebaseAuth
+    private val viewModel: CartViewModel by viewModels { CartViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cart)
-        title = "Your Cart"
 
-        db = FirebaseFirestore.getInstance()
-        auth = FirebaseAuth.getInstance()
-
-        val recycler = findViewById<RecyclerView>(R.id.cartRecyclerView)
         val totalText = findViewById<TextView>(R.id.cartTotal)
+        val emptyText = findViewById<TextView>(R.id.cartEmptyText)
         val placeOrderButton = findViewById<Button>(R.id.placeOrderButton)
 
-        fun updateTotal() {
-            totalText.text = "Total: £${"%.2f".format(CartManager.getTotal())}"
+        val cartAdapter = CartAdapter(onIncrease = viewModel::increase, onDecrease = viewModel::decrease)
+        findViewById<RecyclerView>(R.id.cartRecyclerView).apply {
+            layoutManager = LinearLayoutManager(this@CartActivity)
+            adapter = cartAdapter
         }
 
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = CartAdapter(CartManager.getCart(), ::updateTotal)
-        updateTotal()
+        placeOrderButton.setOnClickListener { viewModel.checkout() }
 
-        placeOrderButton.setOnClickListener {
-            val cartItems = CartManager.getCart()
-            val currentUser = auth.currentUser
-
-            if (cartItems.isEmpty()) {
-                Toast.makeText(this, "Your cart is empty!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        collectWhileStarted(viewModel.uiState) { state ->
+            cartAdapter.submitList(state.items)
+            totalText.text = formatPrice(state.subtotal)
+            emptyText.isVisible = state.isEmpty
+        }
+        collectWhileStarted(viewModel.events) { event ->
+            when (event) {
+                CartEvent.ProceedToPayment -> startActivity(Intent(this, PaymentActivity::class.java))
+                CartEvent.CartEmpty -> toast(R.string.cart_empty)
+                CartEvent.NotLoggedIn -> toast(R.string.error_not_logged_in)
             }
-
-            if (currentUser == null) {
-                Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val intent = Intent(this, PaymentActivity::class.java)
-            intent.putExtra("TOTAL_AMOUNT", CartManager.getTotal())
-            startActivity(intent)
         }
     }
 }

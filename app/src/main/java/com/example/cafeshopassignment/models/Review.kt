@@ -9,5 +9,5 @@ data class Review(
     val customerName: String = "",
     val rating: Int = 0,
     val comment: String = "",
-    val createdAt: Timestamp = Timestamp.now(),
+    val createdAt: Timestamp? = null,
 )

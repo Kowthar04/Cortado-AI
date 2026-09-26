@@ -37,7 +37,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="20dp"
-        android:contentDescription="Mail"
+        android:contentDescription="@string/menu_inbox"
         android:src="@drawable/baseline_mail_24"
         android:background="@null"
         android:tint="@android:color/white"
@@ -53,7 +53,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginEnd="20dp"
-        android:contentDescription="Cart"
+        android:contentDescription="@string/menu_cart"
         android:src="@drawable/ic_shopping_cart"
         android:background="@null"
         android:tint="@android:color/white"
@@ -61,6 +61,18 @@
         app:layout_constraintBottom_toBottomOf="@id/toolbar" />
 
 
+
+    <ImageButton
+        android:id="@+id/ordersButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="4dp"
+        android:contentDescription="@string/menu_my_orders"
+        android:src="@drawable/ic_receipt"
+        android:background="@null"
+        app:tint="@android:color/white"
+        app:layout_constraintEnd_toStartOf="@id/cartButton"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar" />
 
     <ImageView
         android:id="@+id/coffeeLogo"
@@ -137,11 +149,35 @@
         android:layout_marginTop="16dp" />
 
 
+    <ProgressBar
+        android:id="@+id/menuProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/menuRecyclerView"
+        app:layout_constraintBottom_toBottomOf="@id/menuRecyclerView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/menuEmptyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="24dp"
+        android:textColor="@color/dark_gray"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/menuRecyclerView"
+        app:layout_constraintBottom_toBottomOf="@id/menuRecyclerView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:text="Logout"
+        android:text="@string/logout"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:textStyle="bold"

@@ -17,6 +17,7 @@
         android:src="@drawable/ic_arrow_back_white"
         app:tint="#810100"
         android:layout_margin="4dp"
+        android:contentDescription="@string/back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -25,7 +26,7 @@
         android:id="@+id/ordersTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="View Orders"
+        android:text="@string/orders_title_admin"
         android:textColor="#4A2C2A"
         android:textStyle="bold"
         android:textSize="24sp"
@@ -48,7 +49,7 @@
             android:id="@+id/orderSearchInput"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="Search orders by name or user ID..."
+            android:hint="@string/orders_search_hint"
             android:padding="12dp"
             android:textColor="#4A2C2A"
             android:textColorHint="#A1887F"
@@ -75,5 +76,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="12dp"/>
+
+    <TextView
+        android:id="@+id/ordersEmptyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="24dp"
+        android:textColor="#8B6B61"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/ordersRecyclerView"
+        app:layout_constraintBottom_toBottomOf="@id/ordersRecyclerView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,54 +4,47 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
+import com.example.cafeshopassignment.ui.auth.LoginEvent
+import com.example.cafeshopassignment.ui.auth.LoginViewModel
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.toast
 
 class LoginActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
+    private val viewModel: LoginViewModel by viewModels { LoginViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        auth = FirebaseAuth.getInstance()
-
         val emailInput = findViewById<EditText>(R.id.editTextUserName)
         val passwordInput = findViewById<EditText>(R.id.editTextPassword)
         val loginButton = findViewById<Button>(R.id.loginButton)
-        val registerRedirect = findViewById<Button>(R.id.registerRedirectButton)
-        val adminLoginButton = findViewById<Button>(R.id.adminLoginButton)
 
-        adminLoginButton.setOnClickListener {
+        findViewById<Button>(R.id.adminLoginButton).setOnClickListener {
             startActivity(Intent(this, AdminLoginActivity::class.java))
         }
-
-        loginButton.setOnClickListener {
-            val email = emailInput.text.toString().trim()
-            val password = passwordInput.text.toString().trim()
-
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            auth
-                .signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        runOnUiThread {
-                            Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(this, MenuActivity::class.java))
-                            finish() //
-                        }
-                    } else {
-                        Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-        }
-        registerRedirect.setOnClickListener {
+        findViewById<Button>(R.id.registerRedirectButton).setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
+        }
+        loginButton.setOnClickListener {
+            viewModel.login(emailInput.text.toString(), passwordInput.text.toString(), requireAdmin = false)
+        }
+
+        collectWhileStarted(viewModel.isLoading) { loading -> loginButton.isEnabled = !loading }
+        collectWhileStarted(viewModel.events) { event ->
+            when (event) {
+                LoginEvent.LoggedInAsCustomer -> {
+                    toast(R.string.login_success)
+                    startActivity(Intent(this, MenuActivity::class.java))
+                    finish()
+                }
+                LoginEvent.MissingFields -> toast(R.string.login_missing_fields)
+                is LoginEvent.Failed -> toast(R.string.login_failed, event.detail.orEmpty())
+                // Admin-only outcomes are not produced by the customer login.
+                LoginEvent.LoggedInAsAdmin, LoginEvent.NotAnAdmin, LoginEvent.ProfileMissing -> Unit
+            }
         }
     }
 }
