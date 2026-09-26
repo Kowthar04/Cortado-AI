@@ -2,7 +2,8 @@ package com.example.cafeshopassignment.data.remote
 
 import com.example.cafeshopassignment.data.remote.dto.ChatRequest
 import com.example.cafeshopassignment.data.remote.dto.ChatResponse
-import com.google.gson.JsonElement
+import com.example.cafeshopassignment.data.remote.dto.MenuResponse
+import com.example.cafeshopassignment.data.remote.dto.OrderResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -21,16 +22,13 @@ interface CafeApi {
         @Body request: ChatRequest,
     ): ChatResponse
 
-    /**
-     * Current menu as the backend sees it. The app itself still reads the menu from Firestore;
-     * this is kept untyped so the client doesn't break if the backend's response shape evolves.
-     */
+    /** Current menu as the backend sees it (the app's own screens read Firestore directly). */
     @GET("api/menu")
-    suspend fun getMenu(): JsonElement
+    suspend fun getMenu(): MenuResponse
 
-    /** Status of a single order (untyped for the same reason as [getMenu]). */
+    /** A single order, including its status. */
     @GET("api/orders/{id}")
     suspend fun getOrder(
         @Path("id") orderId: String,
-    ): JsonElement
+    ): OrderResponse
 }

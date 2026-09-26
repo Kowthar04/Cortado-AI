@@ -161,8 +161,9 @@ request (backend-only changes are skipped). Instrumented/emulator tests are not 
 - **Analytics card** on the admin dashboard is still a "coming soon" placeholder.
 - **Assistant context**: the conversation lives in memory per screen (not persisted, not shared
   between the Menu and Cart screens), and the app doesn't send its local cart to the backend.
-  `GET /api/menu` and `GET /api/orders/{id}` are declared in `CafeApi` for completeness, but the
-  app reads menu and order data directly from Firestore.
+  `GET /api/menu` and `GET /api/orders/{id}` are declared in `CafeApi`, but the app's screens
+  read menu and order data directly from Firestore. The backend's optional `orderId` chat field
+  isn't sent yet (the backend already looks up the user's recent orders from `userId`).
 - **Passwords are trimmed** before sign-in/registration, as the original app did, so existing
   accounts keep working.
 - **Dependency injection** is a hand-written service locator; Hilt would be the next step if
