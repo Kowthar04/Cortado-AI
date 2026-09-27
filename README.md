@@ -1,4 +1,4 @@
-# CafeShop — AI-Powered Café Ordering Platform
+# Cortado — AI-Powered Café Ordering Platform
 
 A full-stack Android ordering platform with an AI order assistant, combining a native mobile app with a standalone backend service.
 
