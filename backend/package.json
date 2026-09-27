@@ -1,7 +1,7 @@
 {
   "name": "cafeshop-backend",
   "version": "1.0.0",
-  "description": "Standalone Node.js/TypeScript/Express backend for the CafeShop app: AI chat assistant (Claude API) grounded in live Firestore menu/order data, plus an admin orders dashboard.",
+  "description": "Standalone Node.js/TypeScript/Express backend for the CafeShop app: AI chat assistant (Gemini API) grounded in live Firestore menu/order data, plus an admin orders dashboard.",
   "main": "dist/index.js",
   "private": true,
   "scripts": {
@@ -9,8 +9,8 @@
     "build": "tsc -p tsconfig.json && node -e \"require('fs').cpSync('src/public','dist/public',{recursive:true})\"",
     "start": "node dist/index.js",
     "test": "jest",
-    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
-    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
+    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\""
   },
   "engines": {
     "node": ">=18"

@@ -140,13 +140,39 @@ errors, retry). Firebase and HTTP are mocked, so the tests make no real network 
 
 [`.github/workflows/android-ci.yml`](.github/workflows/android-ci.yml) runs
 `./gradlew ktlintCheck assembleDebug testDebugUnitTest` on JDK 17 for every push and pull
-request (backend-only changes are skipped). Instrumented/emulator tests are not run in CI.
+request (backend-only changes are skipped). [`.github/workflows/backend-ci.yml`](.github/workflows/backend-ci.yml)
+does the same (`lint`, `build`, `test`) for `backend/`.
+
+### Emulator screenshot tour
+
+[`.github/workflows/android-emulator-screenshots.yml`](.github/workflows/android-emulator-screenshots.yml)
+is a manually-triggered (`workflow_dispatch`) workflow that boots a real Android emulator on the
+runner, walks the app through login → menu → cart → the Ask AI chat → checkout → order
+confirmation → admin dashboard, and uploads a screenshot from each screen as a downloadable
+workflow artifact. It's kept separate from the fast unit-test CI above because it needs live
+credentials and takes several minutes (real emulator boot + a real Gemini call).
+
+It needs three repo secrets (Settings → Secrets and variables → Actions):
+
+| Secret | What it is |
+|---|---|
+| `GOOGLE_SERVICES_JSON_BASE64` | `base64 -w0 app/google-services.json` of your real Firebase config |
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | Same service account JSON used for `backend/.env` |
+| `GEMINI_API_KEY` | Same Gemini key used for `backend/.env` |
+
+The workflow creates two throwaway Firebase Auth users (`ci-customer-*@example.com`,
+`ci-admin-*@example.com`) via `backend/scripts/ci/createTestUsers.ts` for the tour, and deletes
+them afterward with `deleteTestUsers.ts` in an `if: always()` step — nothing test-related is
+left in the live project. UI navigation is driven by `scripts/ci/ui-tour.sh`, which locates every
+tap target from a live `uiautomator dump` (via `scripts/ci/uiautomator_bounds.py`) instead of
+hardcoded pixel coordinates, so it isn't tied to one emulator resolution.
 
 ## Known limitations / follow-ups
 
-- **Security rules are not in this repo.** Admin-only actions (menu edits, status changes,
-  reading all orders) are gated in the UI by the `users/{uid}.role` field. Firestore security
-  rules must enforce the same, or a modified client could bypass them.
+- ~~Security rules are not in this repo~~ — `firestore.rules` (plus `firebase.json` /
+  `.firebaserc` / `firestore.indexes.json`) is now committed and deployed. It enforces
+  `users/{uid}` role checks server-side (a client can no longer self-promote to `"admin"`),
+  matching the UI-level gating.
 - **Rotate the old Firebase API key.** `google-services.json` used to be committed, so the key
   is still in git history. Restrict it (Android app + SHA-1) or rotate it in the Google Cloud
   console.
