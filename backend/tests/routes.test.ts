@@ -26,9 +26,9 @@ jest.mock("../src/services/orderService", () => ({
   getOrdersByUserId: (userId: string, limit: number) => getOrdersByUserId(userId, limit),
 }));
 
-const askClaude = jest.fn();
-jest.mock("../src/services/claudeService", () => ({
-  askClaude: (systemPrompt: string, messages: unknown) => askClaude(systemPrompt, messages),
+const askGemini = jest.fn();
+jest.mock("../src/services/geminiService", () => ({
+  askGemini: (systemPrompt: string, messages: unknown) => askGemini(systemPrompt, messages),
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -43,7 +43,7 @@ beforeEach(() => {
   listOrders.mockReset();
   getOrderById.mockReset();
   getOrdersByUserId.mockReset();
-  askClaude.mockReset();
+  askGemini.mockReset();
 });
 
 describe("GET /api/menu", () => {
@@ -131,12 +131,12 @@ describe("POST /api/chat", () => {
     expect(res.body.error.code).toBe("BAD_REQUEST");
   });
 
-  it("grounds the reply in Firestore menu data and returns Claude's reply", async () => {
+  it("grounds the reply in Firestore menu data and returns Gemini's reply", async () => {
     verifyIdToken.mockResolvedValueOnce({ uid: "user-1" });
     getMenuItems.mockResolvedValueOnce([
       { id: "1", name: "Latte", category: "Coffee", price: 4.5, availability: true },
     ]);
-    askClaude.mockResolvedValueOnce("We have a delicious Latte for $4.50!");
+    askGemini.mockResolvedValueOnce("We have a delicious Latte for $4.50!");
 
     const res = await request(app)
       .post("/api/chat")
@@ -145,8 +145,8 @@ describe("POST /api/chat", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.reply).toBe("We have a delicious Latte for $4.50!");
-    expect(askClaude).toHaveBeenCalledTimes(1);
-    const [systemPrompt] = askClaude.mock.calls[0];
+    expect(askGemini).toHaveBeenCalledTimes(1);
+    const [systemPrompt] = askGemini.mock.calls[0];
     expect(systemPrompt).toContain("Latte");
   });
 
@@ -156,7 +156,7 @@ describe("POST /api/chat", () => {
     getOrdersByUserId.mockResolvedValueOnce([
       { id: "order-1", totalPrice: 5, status: "Delivered", items: [] },
     ]);
-    askClaude.mockResolvedValueOnce("Your last order was delivered.");
+    askGemini.mockResolvedValueOnce("Your last order was delivered.");
 
     const res = await request(app)
       .post("/api/chat")

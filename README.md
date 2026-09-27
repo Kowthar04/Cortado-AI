@@ -1,6 +1,6 @@
 # CafeShop
 
-An Android café ordering app with a Claude-powered order assistant. Customers browse the
+An Android café ordering app with a Gemini-powered order assistant. Customers browse the
 menu, build a cart, check out, and watch their order's status update live as staff prepare it.
 Admins manage the menu, move orders through their lifecycle, reply to reviews and send
 notifications. An **Ask AI** assistant answers menu questions, makes recommendations, helps
@@ -18,7 +18,7 @@ flowchart LR
     Repo -- "Auth + Firestore SDK<br/>(snapshot listeners)" --> Firebase[("Firebase<br/>Auth + Firestore")]
     Repo -- "Retrofit / OkHttp<br/>Bearer Firebase ID token" --> Backend["Node/Express backend<br/>(backend/)"]
     Backend -- "verify ID token,<br/>read menu/orders" --> Firebase
-    Backend -- "Messages API" --> Claude["Claude API"]
+    Backend -- "generateContent" --> Gemini["Gemini API"]
 ```
 
 - **UI layer** (`ui/<feature>/`, activities in the root package): activities only render
@@ -95,7 +95,7 @@ app/src/main/java/com/example/cafeshopassignment/
 
 4. **Backend**: the AI assistant needs the Node/Express service in [`backend/`](backend/).
    Follow [`backend/README.md`](backend/README.md) to configure and start it (its environment
-   variables, including the Claude API key, are documented there).
+   variables, including the Gemini API key, are documented there).
    - **Emulator + local backend**: keep the default `http://10.0.2.2:3000/` (`10.0.2.2` is the
      emulator's alias for your machine's `localhost`).
    - **Deployed backend**: set `BACKEND_BASE_URL=https://your-backend.example.com/`.
@@ -123,7 +123,7 @@ bottom sheet. The assistant can:
 How it works: the app sends `POST /api/chat` with the message, the last 20 turns of the
 conversation and the user's id, authenticated with the user's Firebase ID token
 (`Authorization: Bearer <token>`, fetched per request and force-refreshed once on a 401). The
-backend verifies the token, gathers menu/order context and calls the Claude API. Suggestion chips
+backend verifies the token, gathers menu/order context and calls the Gemini API. Suggestion chips
 provide one-tap prompts. Failures (offline, backend down, expired session, rate limiting, 5xx)
 show as an inline error bubble; tap it to retry. The conversation is kept while you stay on
 that screen, even if you close and reopen the sheet.

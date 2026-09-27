@@ -2,7 +2,7 @@ import { ChatTurn, MenuItem, Order } from "../types/models";
 
 /**
  * Pure, side-effect-free prompt construction so it can be unit tested
- * without hitting Firestore or the Anthropic API.
+ * without hitting Firestore or the Gemini API.
  */
 
 function formatPrice(price: number): string {
@@ -97,7 +97,7 @@ export function buildSystemPrompt(input: SystemPromptInput): string {
   return sections.join("\n");
 }
 
-export interface AnthropicMessage {
+export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
@@ -105,7 +105,7 @@ export interface AnthropicMessage {
 export function buildMessages(
   conversationHistory: ChatTurn[] | undefined,
   message: string,
-): AnthropicMessage[] {
+): ChatMessage[] {
   const history = (conversationHistory ?? []).map((turn) => ({
     role: turn.role,
     content: turn.content,

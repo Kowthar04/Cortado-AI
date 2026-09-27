@@ -9,8 +9,8 @@ export interface AppConfig {
   firebaseProjectId: string;
   firebaseServiceAccountJson: string | undefined;
   googleApplicationCredentials: string | undefined;
-  anthropicApiKey: string;
-  claudeModel: string;
+  geminiApiKey: string;
+  geminiModel: string;
   chatOrderHistoryLimit: number;
 }
 
@@ -44,8 +44,8 @@ function loadConfig(): AppConfig {
     firebaseProjectId: process.env.FIREBASE_PROJECT_ID ?? "cafeshopassignment",
     firebaseServiceAccountJson: process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
     googleApplicationCredentials: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-    anthropicApiKey: requireEnv("ANTHROPIC_API_KEY", isProduction),
-    claudeModel: process.env.CLAUDE_MODEL ?? "claude-sonnet-5",
+    geminiApiKey: requireEnv("GEMINI_API_KEY", isProduction),
+    geminiModel: process.env.GEMINI_MODEL ?? "gemini-3.8-flash",
     chatOrderHistoryLimit: Number.parseInt(process.env.CHAT_ORDER_HISTORY_LIMIT ?? "5", 10),
   };
 }

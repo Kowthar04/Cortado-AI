@@ -4,7 +4,7 @@ import { requireAuth, AuthenticatedRequest } from "../middleware/auth";
 import { getMenuItems } from "../services/menuService";
 import { getOrderById, getOrdersByUserId } from "../services/orderService";
 import { buildMessages, buildSystemPrompt } from "../services/promptBuilder";
-import { askClaude } from "../services/claudeService";
+import { askGemini } from "../services/geminiService";
 import { ChatRequestBody, ChatResponseBody } from "../types/models";
 import { config } from "../config";
 
@@ -31,7 +31,7 @@ chatRouter.post(
     const systemPrompt = buildSystemPrompt({ menuItems, orderHistory, currentOrder });
     const messages = buildMessages(body.conversationHistory, body.message);
 
-    const reply = await askClaude(systemPrompt, messages);
+    const reply = await askGemini(systemPrompt, messages);
 
     const response: ChatResponseBody = { reply };
     res.status(200).json(response);

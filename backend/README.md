@@ -1,7 +1,7 @@
 # CafeShop Backend
 
 A standalone Node.js + TypeScript + Express backend for the CafeShop Android app. It is the
-portfolio "centerpiece feature" of the revamp: an AI ordering assistant (Claude API) grounded in
+portfolio "centerpiece feature" of the revamp: an AI ordering assistant (Gemini API) grounded in
 live Firestore data, a small JSON API for the app, and a minimal admin dashboard.
 
 ## Architecture
@@ -24,10 +24,10 @@ backend/
       menuService.ts   Firestore reads for menuItems
       orderService.ts  Firestore reads for orders
       promptBuilder.ts pure prompt-construction functions (unit tested, no I/O)
-      claudeService.ts wraps @anthropic-ai/sdk calls
+      geminiService.ts wraps @google/generative-ai calls
     types/models.ts    TypeScript types mirroring the Kotlin models
     public/            static admin dashboard (HTML/CSS/vanilla JS), served at /admin
-  tests/               Jest unit tests (mocked Firestore/Anthropic clients)
+  tests/               Jest unit tests (mocked Firestore/Gemini clients)
 ```
 
 Firestore collections used (matching the Android app's models under
@@ -49,7 +49,7 @@ not just "glue code" behind Firestore triggers. A standalone service: (1) can be
 host (Render, Railway, Fly.io, a VPS) independent of the Firebase project, showing infra
 portability; (2) has full control over routing, middleware, and error-handling conventions, which
 is what interviewers actually look at in a full-stack/AI engineer portfolio; (3) is easier to load
-test, version, and add non-Firebase integrations to (here, the Anthropic API) without fighting
+test, version, and add non-Firebase integrations to (here, the Gemini API) without fighting
 Cloud Functions' request/response model and cold-start constraints; and (4) mirrors how a real
 product team would split a "core CRUD backed by Firestore" concern from a "growing AI feature"
 concern into a dedicated service, rather than cramming both into triggers.
@@ -70,8 +70,8 @@ concern into a dedicated service, rather than cramming both into triggers.
      - Set `FIREBASE_SERVICE_ACCOUNT_JSON` to the file's contents as a single-line JSON string, or
      - Set `GOOGLE_APPLICATION_CREDENTIALS` to the absolute path of the downloaded file.
 
-3. **Get an Anthropic API key**: create one at https://console.anthropic.com/settings/keys and
-   set `ANTHROPIC_API_KEY`.
+3. **Get a Gemini API key**: create one at https://aistudio.google.com/apikey (Google AI Studio)
+   and set `GEMINI_API_KEY`.
 
 4. **Copy the env file and fill in values**
 
@@ -98,8 +98,8 @@ concern into a dedicated service, rather than cramming both into triggers.
 | `FIREBASE_PROJECT_ID` | no | `cafeshopassignment` | Firebase project id |
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | one of these two | — | Full service account JSON as a string |
 | `GOOGLE_APPLICATION_CREDENTIALS` | one of these two | — | Path to a service account JSON file |
-| `ANTHROPIC_API_KEY` | yes (production) | — | Claude API key |
-| `CLAUDE_MODEL` | no | `claude-sonnet-5` | Claude model id used for `/api/chat` |
+| `GEMINI_API_KEY` | yes (production) | — | Gemini Developer API key |
+| `GEMINI_MODEL` | no | `gemini-3.8-flash` | Gemini model id used for `/api/chat` |
 | `CHAT_ORDER_HISTORY_LIMIT` | no | `5` | Max past orders fed into the chat context |
 
 ## API Reference
@@ -146,8 +146,8 @@ Request body:
 
 - `conversationHistory` is optional prior turns (role `user`/`assistant`).
 - `userId`, when provided, is used to fetch the caller's last `CHAT_ORDER_HISTORY_LIMIT` orders
-  from Firestore so Claude can make personalized recommendations.
-- `orderId`, when provided, is used to fetch that order and let Claude answer status questions
+  from Firestore so Gemini can make personalized recommendations.
+- `orderId`, when provided, is used to fetch that order and let Gemini answer status questions
   about it in natural language.
 
 The handler always fetches the current menu from Firestore and builds a system prompt grounded in
@@ -255,7 +255,7 @@ production-grade admin console.
 npm test
 ```
 
-Jest + ts-jest, with `jest.mock` used to fully mock `firebase-admin` and `@anthropic-ai/sdk` calls
+Jest + ts-jest, with `jest.mock` used to fully mock `firebase-admin` and `@google/generative-ai` calls
 — no network access during tests. Coverage:
 
 - `tests/promptBuilder.test.ts`: menu formatting, order-history formatting, order-status
@@ -263,7 +263,7 @@ Jest + ts-jest, with `jest.mock` used to fully mock `firebase-admin` and `@anthr
 - `tests/auth.test.ts`: `requireAuth` (missing header, malformed header, invalid token, valid
   token) and `requireAdmin` (unauthenticated, non-admin, admin).
 - `tests/routes.test.ts`: `/api/menu`, `/api/orders`, `/api/orders/:id`, and `/api/chat` with
-  mocked Firestore/Anthropic services, covering auth failures, not-found, and success paths.
+  mocked Firestore/Gemini services, covering auth failures, not-found, and success paths.
 
 ## Lint & format
 
