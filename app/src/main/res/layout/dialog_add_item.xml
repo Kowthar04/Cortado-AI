@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@drawable/input_background"
-        android:hint="Category (Drinks, Breakfast...)"
+        android:hint="Category: Drinks, Breakfast, Lunch or Pastries &amp; Sweets"
         android:padding="12dp"
         android:layout_marginTop="12dp"
         android:textColor="#4A2C2A"

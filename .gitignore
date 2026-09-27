@@ -1,15 +1,33 @@
+# Gradle / build output
+.gradle/
+build/
+/captures
+.externalNativeBuild
+.cxx
+
+# Kotlin compiler daemon caches and error logs
+.kotlin/
+
+# Local machine configuration (sdk.dir, BACKEND_BASE_URL, ...)
+local.properties
+
+# Firebase client config: every contributor downloads their own from the
+# Firebase console. See app/google-services.json.example and the README.
+google-services.json
+
+# IDE
 *.iml
-.gradle
-/local.properties
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/deviceManager.xml
+
+# Local background-agent worktree scratch directory
+/.claude/
+
+# OS
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties

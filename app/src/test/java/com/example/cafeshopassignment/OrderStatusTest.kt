@@ -1,7 +1,8 @@
 package com.example.cafeshopassignment
 
 import com.example.cafeshopassignment.models.Order
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 
@@ -10,14 +11,14 @@ class OrderStatusTest {
 
     @Before
     fun setup() {
-        baseOrder = Order(
-            id = "001",
-            customerName = "Amina Ali",
-            status = "Pending",
-            totalPrice = 7.50
-        )
+        baseOrder =
+            Order(
+                id = "001",
+                customerName = "Amina Ali",
+                status = "Pending",
+                totalPrice = 7.50,
+            )
     }
-
 
     @Test
     fun updateOrderStatus_isSuccessful() {
@@ -26,14 +27,12 @@ class OrderStatusTest {
         assertEquals("Pending", baseOrder.status)
     }
 
-
     @Test
     fun orderCompletion_setsCorrectStatus() {
         val completed = baseOrder.copy(status = "Completed")
         assertEquals("Completed", completed.status)
         assertEquals("Pending", baseOrder.status)
     }
-
 
     @Test
     fun invalidStatus_doesNotMatchExpectedStates() {
@@ -42,7 +41,6 @@ class OrderStatusTest {
         assertFalse(validStatuses.contains(invalid.status))
         assertEquals("Pending", baseOrder.status)
     }
-
 
     @Test
     fun statusTransition_flowIsCorrect() {
@@ -54,7 +52,6 @@ class OrderStatusTest {
         assertEquals("Completed", completed.status)
         assertEquals("Pending", baseOrder.status)
     }
-
 
     @Test
     fun updatingStatus_doesNotAffectTotalPrice() {

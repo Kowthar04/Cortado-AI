@@ -1,17 +1,16 @@
 package com.example.cafeshopassignment
 
 import com.example.cafeshopassignment.models.MenuItem
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-class ManageMenuTest {
 
+class ManageMenuTest {
     private val menuList = mutableListOf<MenuItem>()
 
     @Before
-
     fun setup() {
-
         menuList.add(MenuItem(id = "1", name = "Latte", price = 3.50, category = "Drinks"))
     }
 

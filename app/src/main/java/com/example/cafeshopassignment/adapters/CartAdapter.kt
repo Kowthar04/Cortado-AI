@@ -1,64 +1,80 @@
 package com.example.cafeshopassignment.adapters
 
-import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.cafeshopassignment.CartManager
 import com.example.cafeshopassignment.R
 import com.example.cafeshopassignment.models.CartItem
+import com.example.cafeshopassignment.ui.common.formatPrice
 
-class CartAdapter(private var cartItems: MutableList<CartItem>, private val updateTotal: () -> Unit) :
-    RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_cart, parent, false)
+/** Renders cart lines; quantity changes are delegated to the ViewModel, which re-emits the list. */
+class CartAdapter(
+    private val onIncrease: (CartItem) -> Unit,
+    private val onDecrease: (CartItem) -> Unit,
+) : ListAdapter<CartItem, CartAdapter.CartViewHolder>(DIFF) {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CartViewHolder {
+        val view =
+            LayoutInflater
+                .from(parent.context)
+                .inflate(R.layout.item_cart, parent, false)
         return CartViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
-        val item = cartItems[position]
+    override fun onBindViewHolder(
+        holder: CartViewHolder,
+        position: Int,
+    ) {
+        val item = getItem(position)
 
         holder.name.text = item.name
-        holder.price.text = "£${"%.2f".format(item.totalPrice)}"
+        holder.price.text = formatPrice(item.totalPrice)
         holder.quantity.text = item.quantity.toString()
 
-        Glide.with(holder.itemView.context)
+        Glide
+            .with(holder.itemView.context)
             .load(item.imageUrl)
+            .placeholder(R.drawable.ic_coffee_cup)
+            .error(R.drawable.ic_coffee_cup)
             .centerCrop()
             .into(holder.cartItemImage)
 
-        holder.btnPlus.setOnClickListener {
-            CartManager.increaseQuantity(item.id)
-            refresh()
-        }
-
-        holder.btnMinus.setOnClickListener {
-            CartManager.decreaseQuantity(item.id)
-            refresh()
-        }
+        holder.btnPlus.setOnClickListener { onIncrease(item) }
+        holder.btnMinus.setOnClickListener { onDecrease(item) }
     }
 
-    override fun getItemCount() = cartItems.size
-
-    private fun refresh() {
-        cartItems = CartManager.getCart()
-        notifyDataSetChanged()
-        updateTotal()
-    }
-
-    class CartViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class CartViewHolder(
+        view: View,
+    ) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.cartItemName)
         val cartItemImage: ImageView = view.findViewById(R.id.cartItemImage)
         val price: TextView = view.findViewById(R.id.cartItemPrice)
         val quantity: TextView = view.findViewById(R.id.cartQty)
         val btnPlus: ImageButton = view.findViewById(R.id.btnPlus)
         val btnMinus: ImageButton = view.findViewById(R.id.btnMinus)
+    }
+
+    private companion object {
+        val DIFF =
+            object : DiffUtil.ItemCallback<CartItem>() {
+                override fun areItemsTheSame(
+                    oldItem: CartItem,
+                    newItem: CartItem,
+                ) = oldItem.id == newItem.id
+
+                override fun areContentsTheSame(
+                    oldItem: CartItem,
+                    newItem: CartItem,
+                ) = oldItem == newItem
+            }
     }
 }

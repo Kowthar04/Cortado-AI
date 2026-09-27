@@ -11,6 +11,19 @@ data class Order(
     val serviceFee: Double = 0.0,
     val discount: Double = 0.0,
     val totalPrice: Double = 0.0,
-    val status: String = "Pending",
-    val createdAt: Timestamp? = null
-)
+    val status: String = OrderStatus.PENDING.label,
+    val createdAt: Timestamp? = null,
+    val paymentMethod: String = "",
+) {
+    val orderStatus: OrderStatus?
+        get() = OrderStatus.fromLabel(status)
+
+    /** e.g. "Latte ×1, Cappuccino ×2" */
+    val itemsSummary: String
+        get() =
+            items.joinToString(", ") { map ->
+                val name = map["name"] as? String ?: "Unknown"
+                val qty = (map["quantity"] as? Number)?.toInt() ?: 1
+                "$name ×$qty"
+            }
+}

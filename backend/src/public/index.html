@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CafeShop Admin Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>CafeShop Admin Dashboard</h1>
+    <p class="subtitle">Live order feed, backed by <code>GET /api/orders</code></p>
+  </header>
+
+  <section id="login-panel" class="card">
+    <h2>Sign in</h2>
+    <p>
+      Paste a Firebase ID token for an account whose Firestore <code>users/&#123;uid&#125;.role</code>
+      is <code>"admin"</code>. For a demo, generate one via the Firebase Auth REST
+      <code>signInWithPassword</code> endpoint, the Firebase JS SDK
+      (<code>await firebaseUser.getIdToken()</code>), or the Firebase emulator — see the backend
+      README's "Admin dashboard auth demo flow" section for exact steps.
+    </p>
+    <textarea id="token-input" rows="4" placeholder="Paste Firebase ID token here"></textarea>
+    <button id="login-btn">Connect</button>
+    <p id="login-error" class="error" hidden></p>
+  </section>
+
+  <section id="dashboard-panel" class="card" hidden>
+    <div class="dashboard-header">
+      <h2>Orders</h2>
+      <div>
+        <span id="status-indicator">idle</span>
+        <button id="logout-btn">Sign out</button>
+      </div>
+    </div>
+    <table id="orders-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Status</th>
+          <th>Payment</th>
+          <th>Items</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="orders-body"></tbody>
+    </table>
+    <p id="orders-empty" hidden>No orders yet.</p>
+    <p id="orders-error" class="error" hidden></p>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>

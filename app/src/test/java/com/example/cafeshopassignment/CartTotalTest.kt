@@ -4,19 +4,21 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class CartTotalTest {
+    data class CartItem(
+        val name: String,
+        val quantity: Int,
+        val price: Double,
+    )
 
-    data class CartItem(val name: String, val quantity: Int, val price: Double)
-
-    private fun calculateTotal(cart: List<CartItem>): Double {
-        return cart.sumOf { it.quantity * it.price }
-    }
+    private fun calculateTotal(cart: List<CartItem>): Double = cart.sumOf { it.quantity * it.price }
 
     @Test
     fun `calculates the total of cart items`() {
-        val cart = listOf(
-            CartItem("Coffee", 2, 3.0),
-            CartItem("Donut", 1, 2.50)
-        )
+        val cart =
+            listOf(
+                CartItem("Coffee", 2, 3.0),
+                CartItem("Donut", 1, 2.50),
+            )
 
         val result = calculateTotal(cart)
 

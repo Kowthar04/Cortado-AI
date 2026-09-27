@@ -4,90 +4,49 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.cafeshopassignment.ui.auth.LoginEvent
+import com.example.cafeshopassignment.ui.auth.LoginViewModel
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.toast
 
 class AdminLoginActivity : AppCompatActivity() {
-
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+    private val viewModel: LoginViewModel by viewModels { LoginViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin_login)
 
-        auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
-
         val emailInput = findViewById<EditText>(R.id.adminEmailInput)
         val passwordInput = findViewById<EditText>(R.id.adminPasswordInput)
         val loginButton = findViewById<Button>(R.id.adminLoginButton)
-        val backButton = findViewById<Button>(R.id.backToUserLoginButton)
 
-        backButton.setOnClickListener {
+        findViewById<Button>(R.id.backToUserLoginButton).setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
-
         loginButton.setOnClickListener {
-            val email = emailInput.text.toString().trim()
-            val password = passwordInput.text.toString().trim()
+            viewModel.login(emailInput.text.toString(), passwordInput.text.toString(), requireAdmin = true)
+        }
 
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please enter Email and Password", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val uid = auth.currentUser?.uid
-                        if (uid == null) {
-                            Toast.makeText(this, "User ID not found", Toast.LENGTH_SHORT).show()
-                            return@addOnCompleteListener
+        collectWhileStarted(viewModel.isLoading) { loading -> loginButton.isEnabled = !loading }
+        collectWhileStarted(viewModel.events) { event ->
+            when (event) {
+                LoginEvent.LoggedInAsAdmin -> {
+                    toast(R.string.admin_login_success)
+                    val intent =
+                        Intent(this, AdminDashboardActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         }
-
-                        db.collection("users").document(uid)
-                            .get()
-                            .addOnSuccessListener { doc ->
-                                if (doc != null && doc.exists()) {
-                                    val role = doc.getString("role")?.lowercase() ?: "customer"
-
-                                    if (role == "admin") {
-                                        Toast.makeText(this, "Admin Login Successful", Toast.LENGTH_SHORT).show()
-                                        val intent = Intent(this, AdminDashboardActivity::class.java)
-                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                        startActivity(intent)
-                                    } else {
-                                        Toast.makeText(this, "Access denied: Not an admin", Toast.LENGTH_SHORT).show()
-                                        auth.signOut()
-                                    }
-                                } else {
-                                    Toast.makeText(this, "User record not found in Firestore", Toast.LENGTH_SHORT).show()
-                                    auth.signOut()
-                                }
-                            }
-                            .addOnFailureListener { e ->
-                                Toast.makeText(this, "Error getting role: ${e.message}", Toast.LENGTH_SHORT).show()
-                                auth.signOut()
-                            }
-                    } else {
-                        Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                    }
+                    startActivity(intent)
                 }
+                LoginEvent.MissingFields -> toast(R.string.login_missing_fields)
+                LoginEvent.NotAnAdmin -> toast(R.string.admin_access_denied)
+                LoginEvent.ProfileMissing -> toast(R.string.admin_profile_missing)
+                is LoginEvent.Failed -> toast(R.string.login_failed, event.detail.orEmpty())
+                LoginEvent.LoggedInAsCustomer -> Unit
+            }
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-

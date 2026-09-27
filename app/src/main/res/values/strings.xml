@@ -1,3 +1,154 @@
 <resources>
-    <string name="app_name">CafeShopAssignment</string>
+    <string name="app_name">CafeShop</string>
+
+    <!-- Common -->
+    <string name="action_add">Add</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_send">Send</string>
+    <string name="back">Back</string>
+    <string name="logout">Logout</string>
+    <string name="logged_out">Logged out</string>
+    <string name="error_not_logged_in">Please log in first</string>
+
+    <!-- Login / registration -->
+    <string name="login_success">Login successful!</string>
+    <string name="login_missing_fields">Please enter email and password</string>
+    <string name="login_failed">Login failed: %1$s</string>
+    <string name="admin_login_success">Admin login successful</string>
+    <string name="admin_access_denied">Access denied: not an admin account</string>
+    <string name="admin_profile_missing">No user profile found for this account</string>
+    <string name="register_success">Registration successful! Please log in.</string>
+    <string name="register_missing_fields">Please fill in all fields</string>
+    <string name="register_failed">Registration failed: %1$s</string>
+
+    <!-- Menu -->
+    <string name="menu_welcome">Welcome!</string>
+    <string name="menu_welcome_name">Welcome, %1$s!</string>
+    <string name="menu_added_to_cart">%1$s added to cart!</string>
+    <string name="menu_empty_category">No items in %1$s yet</string>
+    <string name="menu_load_failed">Couldn\'t load the menu. Tap to retry.</string>
+    <string name="menu_inbox">Inbox</string>
+    <string name="menu_cart">Cart</string>
+    <string name="menu_my_orders">My orders</string>
+
+    <!-- Cart -->
+    <string name="cart_title">Your Order</string>
+    <string name="cart_total_label">Total Amount</string>
+    <string name="cart_place_order">Place Order</string>
+    <string name="cart_empty">Your cart is empty!</string>
+    <string name="cart_empty_state">Your cart is empty. Add something tasty from the menu ☕</string>
+
+    <!-- Payment -->
+    <string name="payment_pay_now">Pay Now</string>
+    <string name="payment_processing">Processing…</string>
+    <string name="payment_promo_empty">Enter a promo code first</string>
+    <string name="payment_promo_applied" formatted="false">Promo code applied: 20% off!</string>
+    <string name="payment_promo_invalid">Invalid promo code</string>
+    <string name="payment_select_method">Please select a payment method</string>
+    <string name="payment_failed">Payment failed: %1$s</string>
+    <string name="payment_demo_notice">Demo checkout: no real payment is taken</string>
+    <string name="card_error_number">Invalid card number</string>
+    <string name="card_error_name">Enter the cardholder name</string>
+    <string name="card_error_expiry_format">Use MMYY format</string>
+    <string name="card_error_month">Invalid month</string>
+    <string name="card_error_cvv">Invalid CVV</string>
+
+    <!-- Order confirmation + live tracking -->
+    <string name="confirmation_title">Payment Successful!</string>
+    <string name="confirmation_subtitle">Your order has been confirmed</string>
+    <string name="confirmation_order_number">Order #%1$s</string>
+    <string name="confirmation_total_paid">Total Paid: %1$s</string>
+    <string name="confirmation_view_orders">View My Orders</string>
+    <string name="confirmation_leave_review">Leave a Review</string>
+    <string name="confirmation_back_to_menu">Back to Menu</string>
+    <string name="tracking_title">LIVE ORDER STATUS</string>
+    <string name="tracking_connecting">Connecting to live updates…</string>
+    <string name="tracking_pending">We\'ve received your order and it\'s in the queue.</string>
+    <string name="tracking_preparing">Your order is being prepared ☕</string>
+    <string name="tracking_ready">Your order is ready for collection!</string>
+    <string name="tracking_completed">Order completed. Enjoy!</string>
+    <string name="tracking_not_found">We couldn\'t find this order.</string>
+    <string name="tracking_error">Live updates are unavailable right now.</string>
+
+    <!-- Orders list -->
+    <string name="orders_title_admin">View Orders</string>
+    <string name="orders_title_customer">My Orders</string>
+    <string name="orders_search_hint">Search orders by name or user ID…</string>
+    <string name="orders_filter_all">All</string>
+    <string name="orders_update_status_title">Update Order Status</string>
+    <string name="orders_status_updated">Status updated to %1$s</string>
+    <string name="orders_status_update_failed">Status update failed: %1$s</string>
+    <string name="orders_load_failed">Failed to load orders: %1$s</string>
+    <string name="orders_empty">No orders yet</string>
+    <string name="orders_no_matches">No orders match your filters</string>
+    <string name="order_customer">Customer: %1$s</string>
+    <string name="order_items">Items: %1$s</string>
+    <string name="order_total">Total: %1$s</string>
+    <string name="order_user_id">User ID: %1$s</string>
+
+    <!-- Admin: dashboard -->
+    <string name="dashboard_welcome_admin">Welcome, Admin!</string>
+    <string name="dashboard_analytics_coming_soon">Analytics screen coming soon!</string>
+    <string name="dashboard_stats_failed">Failed to load dashboard stats: %1$s</string>
+    <string name="dashboard_no_recent_orders">No recent orders.</string>
+    <string name="dashboard_orders_failed">Failed to load orders.</string>
+    <string name="dashboard_order_row">• %1$s  -  %2$s</string>
+
+    <!-- Admin: manage menu -->
+    <string name="manage_menu_add_title">Add Menu Item</string>
+    <string name="manage_menu_edit_title">Edit Item</string>
+    <string name="manage_menu_delete_title">Delete Item</string>
+    <string name="manage_menu_delete_message">Remove %1$s?</string>
+    <string name="manage_menu_item_added">Item added!</string>
+    <string name="manage_menu_item_updated">Item updated!</string>
+    <string name="manage_menu_item_deleted">Item deleted!</string>
+    <string name="manage_menu_operation_failed">Something went wrong: %1$s</string>
+    <string name="manage_menu_load_failed">Failed to load the menu: %1$s</string>
+    <string name="manage_menu_missing_fields">Fill in all fields</string>
+    <string name="manage_menu_invalid_price">Enter a valid price greater than 0</string>
+    <string name="manage_menu_unknown_category">Category must be Drinks, Breakfast, Lunch or Pastries &amp; Sweets</string>
+
+    <!-- Reviews -->
+    <string name="review_from">From: %1$s</string>
+    <string name="review_missing_rating">Please select a rating</string>
+    <string name="review_missing_comment">Please write a comment</string>
+    <string name="review_submitted">Review submitted!</string>
+    <string name="review_failed">Failed to submit review: %1$s</string>
+    <string name="reviews_reply_title">Reply to Customer</string>
+    <string name="reviews_reply_hint">Write your reply…</string>
+    <string name="reviews_reply_empty">Reply cannot be empty</string>
+    <string name="reviews_reply_sent">Reply sent!</string>
+    <string name="reviews_reply_failed">Failed to send reply: %1$s</string>
+
+    <!-- AI order assistant -->
+    <string name="chat_fab">Ask AI</string>
+    <string name="chat_open">Open the AI order assistant</string>
+    <string name="chat_title">Ask AI</string>
+    <string name="chat_subtitle">Your café assistant, powered by Claude</string>
+    <string name="chat_empty_title">Hi! How can I help?</string>
+    <string name="chat_empty_body">Ask about the menu, get a recommendation, customise your order or check on an order.</string>
+    <string name="chat_input_hint">Ask about the menu or your order…</string>
+    <string name="chat_send">Send</string>
+    <string name="chat_typing">Assistant is typing…</string>
+    <string name="chat_suggestion_menu">What\'s on the menu?</string>
+    <string name="chat_suggestion_recommend">Recommend something sweet</string>
+    <string name="chat_suggestion_customise">Can I get my latte with oat milk?</string>
+    <string name="chat_suggestion_order_status">Where\'s my latest order?</string>
+    <string name="chat_error_with_retry">%1$s Tap to retry.</string>
+    <string name="chat_error_network">Can\'t reach the assistant. Check your connection (and that the backend is running).</string>
+    <string name="chat_error_unauthorized">Your session has expired. Please log in again.</string>
+    <string name="chat_error_rate_limited">The assistant is busy right now. Please wait a moment.</string>
+    <string name="chat_error_server">The assistant hit a problem on our side.</string>
+    <string name="chat_error_empty">The assistant didn\'t send a reply.</string>
+    <string name="chat_error_unknown">Something went wrong.</string>
+
+    <!-- Notifications -->
+    <string name="inbox_load_failed">Failed to load notifications: %1$s</string>
+    <string name="send_missing_fields">Please fill in the title and message</string>
+    <string name="send_missing_recipient">Enter a recipient user ID or enable \'Send to All\'</string>
+    <string name="send_sent_to_user">Notification sent!</string>
+    <string name="send_sent_to_all">Notification sent to %1$d users!</string>
+    <string name="send_failed">Failed to send notification: %1$s</string>
 </resources>

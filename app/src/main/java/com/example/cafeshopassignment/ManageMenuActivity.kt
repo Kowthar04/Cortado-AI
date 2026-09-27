@@ -1,204 +1,141 @@
 package com.example.cafeshopassignment
 
 import android.os.Bundle
+import android.view.View
 import android.widget.EditText
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cafeshopassignment.adapters.AdminMenuAdapter
+import com.example.cafeshopassignment.models.MenuCategories
 import com.example.cafeshopassignment.models.MenuItem
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.cafeshopassignment.ui.admin.ManageMenuEvent
+import com.example.cafeshopassignment.ui.admin.ManageMenuUiState
+import com.example.cafeshopassignment.ui.admin.ManageMenuViewModel
+import com.example.cafeshopassignment.ui.admin.MenuInputError
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.toast
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ManageMenuActivity : AppCompatActivity() {
+    private val viewModel: ManageMenuViewModel by viewModels { ManageMenuViewModel.Factory }
 
-    private lateinit var db: FirebaseFirestore
-
-    private lateinit var drinksRecycler: RecyclerView
-    private lateinit var breakfastRecycler: RecyclerView
-    private lateinit var lunchRecycler: RecyclerView
-    private lateinit var pastriesRecycler: RecyclerView
-
-    private lateinit var drinksAdapter: AdminMenuAdapter
-    private lateinit var breakfastAdapter: AdminMenuAdapter
-    private lateinit var lunchAdapter: AdminMenuAdapter
-    private lateinit var pastriesAdapter: AdminMenuAdapter
-
-    private val drinksList = mutableListOf<MenuItem>()
-    private val breakfastList = mutableListOf<MenuItem>()
-    private val lunchList = mutableListOf<MenuItem>()
-    private val pastriesList = mutableListOf<MenuItem>()
+    /** One adapter per category section in the layout. */
+    private lateinit var adapters: Map<String, AdminMenuAdapter>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manage_menu)
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.adminToolbar)
+        val toolbar = findViewById<Toolbar>(R.id.adminToolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
 
-        db = FirebaseFirestore.getInstance()
+        val recyclerIds =
+            mapOf(
+                MenuCategories.DRINKS to R.id.recyclerDrinks,
+                MenuCategories.BREAKFAST to R.id.recyclerBreakfast,
+                MenuCategories.LUNCH to R.id.recyclerLunch,
+                MenuCategories.PASTRIES to R.id.recyclerPastries,
+            )
+        adapters =
+            recyclerIds.mapValues { (_, recyclerId) ->
+                AdminMenuAdapter(onEdit = ::showEditDialog, onDelete = ::confirmDelete).also { adapter ->
+                    findViewById<RecyclerView>(recyclerId).apply {
+                        layoutManager = LinearLayoutManager(this@ManageMenuActivity)
+                        this.adapter = adapter
+                    }
+                }
+            }
 
-        drinksRecycler = findViewById(R.id.recyclerDrinks)
-        breakfastRecycler = findViewById(R.id.recyclerBreakfast)
-        lunchRecycler = findViewById(R.id.recyclerLunch)
-        pastriesRecycler = findViewById(R.id.recyclerPastries)
+        findViewById<FloatingActionButton>(R.id.addItemFAB).setOnClickListener { showAddDialog() }
 
-        drinksAdapter = AdminMenuAdapter(drinksList, ::editItem, ::deleteItem)
-        breakfastAdapter = AdminMenuAdapter(breakfastList, ::editItem, ::deleteItem)
-        lunchAdapter = AdminMenuAdapter(lunchList, ::editItem, ::deleteItem)
-        pastriesAdapter = AdminMenuAdapter(pastriesList, ::editItem, ::deleteItem)
-
-        drinksRecycler.layoutManager = LinearLayoutManager(this)
-        breakfastRecycler.layoutManager = LinearLayoutManager(this)
-        lunchRecycler.layoutManager = LinearLayoutManager(this)
-        pastriesRecycler.layoutManager = LinearLayoutManager(this)
-
-        drinksRecycler.adapter = drinksAdapter
-        breakfastRecycler.adapter = breakfastAdapter
-        lunchRecycler.adapter = lunchAdapter
-        pastriesRecycler.adapter = pastriesAdapter
-
-        loadAllCategories()
-
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.addItemFAB)
-            .setOnClickListener { showAddItemDialog() }
+        collectWhileStarted(viewModel.uiState, ::render)
+        collectWhileStarted(viewModel.events, ::handleEvent)
     }
 
-    private fun loadAllCategories() {
-        loadCategory("Drinks", drinksList, drinksAdapter)
-        loadCategory("Breakfast", breakfastList, breakfastAdapter)
-        loadCategory("Lunch", lunchList, lunchAdapter)
-        loadCategory("Pastries & Sweets", pastriesList, pastriesAdapter)
+    private fun render(state: ManageMenuUiState) {
+        adapters.forEach { (category, adapter) -> adapter.submitList(state.itemsByCategory[category].orEmpty()) }
     }
 
-    private fun loadCategory(
-        category: String,
-        list: MutableList<MenuItem>,
-        adapter: AdminMenuAdapter
+    private fun handleEvent(event: ManageMenuEvent) {
+        when (event) {
+            is ManageMenuEvent.LoadFailed -> toast(R.string.manage_menu_load_failed, event.detail.orEmpty())
+            ManageMenuEvent.ItemAdded -> toast(R.string.manage_menu_item_added)
+            ManageMenuEvent.ItemUpdated -> toast(R.string.manage_menu_item_updated)
+            ManageMenuEvent.ItemDeleted -> toast(R.string.manage_menu_item_deleted)
+            is ManageMenuEvent.OperationFailed -> toast(R.string.manage_menu_operation_failed, event.detail.orEmpty())
+            is ManageMenuEvent.InvalidInput ->
+                toast(
+                    when (event.error) {
+                        MenuInputError.MISSING_FIELDS -> R.string.manage_menu_missing_fields
+                        MenuInputError.INVALID_PRICE -> R.string.manage_menu_invalid_price
+                        MenuInputError.UNKNOWN_CATEGORY -> R.string.manage_menu_unknown_category
+                    },
+                )
+        }
+    }
+
+    private fun showAddDialog() {
+        val form = MenuItemForm(layoutInflater.inflate(R.layout.dialog_add_item, null))
+        AlertDialog
+            .Builder(this)
+            .setTitle(R.string.manage_menu_add_title)
+            .setView(form.root)
+            .setPositiveButton(R.string.action_add) { _, _ ->
+                viewModel.addItem(form.name, form.price, form.category)
+            }.setNegativeButton(R.string.action_cancel, null)
+            .show()
+    }
+
+    private fun showEditDialog(item: MenuItem) {
+        val form = MenuItemForm(layoutInflater.inflate(R.layout.dialog_add_item, null))
+        form.fill(item)
+        AlertDialog
+            .Builder(this)
+            .setTitle(R.string.manage_menu_edit_title)
+            .setView(form.root)
+            .setPositiveButton(R.string.action_save) { _, _ ->
+                viewModel.updateItem(item, form.name, form.price, form.category)
+            }.setNegativeButton(R.string.action_cancel, null)
+            .show()
+    }
+
+    private fun confirmDelete(item: MenuItem) {
+        AlertDialog
+            .Builder(this)
+            .setTitle(R.string.manage_menu_delete_title)
+            .setMessage(getString(R.string.manage_menu_delete_message, item.name))
+            .setPositiveButton(R.string.action_delete) { _, _ -> viewModel.deleteItem(item) }
+            .setNegativeButton(R.string.action_cancel, null)
+            .show()
+    }
+
+    /** Thin wrapper over dialog_add_item.xml. */
+    private class MenuItemForm(
+        val root: View,
     ) {
-        db.collection("menuItems")
-            .whereEqualTo("category", category)
-            .get()
-            .addOnSuccessListener { result ->
-                list.clear()
-                for (doc in result) {
-                    val priceAny = doc.get("price")
-                    val price = when (priceAny) {
-                        is Number -> priceAny.toDouble()
-                        is String -> priceAny.toDoubleOrNull() ?: 0.0
-                        else -> 0.0
-                    }
+        private val nameInput: EditText = root.findViewById(R.id.itemNameInput)
+        private val priceInput: EditText = root.findViewById(R.id.itemPriceInput)
+        private val categoryInput: EditText = root.findViewById(R.id.itemCategoryInput)
 
-                    val item = MenuItem(
-                        id = doc.id,
-                        name = doc.getString("name") ?: "",
-                        category = category,
-                        price = price,
-                        availability = doc.getBoolean("availability") ?: true
-                    )
-                    list.add(item)
-                }
-                adapter.notifyDataSetChanged()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to load $category", Toast.LENGTH_SHORT).show()
-            }
-    }
+        init {
+            // The AlertDialog supplies the title.
+            root.findViewById<View>(R.id.dialogTitle).visibility = View.GONE
+        }
 
-    private fun showAddItemDialog() {
-        val view = layoutInflater.inflate(R.layout.dialog_add_item, null)
+        val name: String get() = nameInput.text.toString()
+        val price: String get() = priceInput.text.toString()
+        val category: String get() = categoryInput.text.toString()
 
-        val nameInput = view.findViewById<EditText>(R.id.itemNameInput)
-        val priceInput = view.findViewById<EditText>(R.id.itemPriceInput)
-        val categoryInput = view.findViewById<EditText>(R.id.itemCategoryInput)
-
-        AlertDialog.Builder(this)
-            .setTitle("Add Menu Item")
-            .setView(view)
-            .setPositiveButton("Add") { _, _ ->
-
-                val name = nameInput.text.toString().trim()
-                val price = priceInput.text.toString().toDoubleOrNull()
-                val category = categoryInput.text.toString().trim()
-
-                if (name.isEmpty() || price == null || category.isEmpty()) {
-                    Toast.makeText(this, "Fill all fields correctly", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                val newItem = MenuItem(
-                    name = name,
-                    price = price,
-                    category = category,
-                    availability = true
-                )
-
-                db.collection("menuItems")
-                    .add(newItem)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Item added!", Toast.LENGTH_SHORT).show()
-                        loadAllCategories()
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun editItem(item: MenuItem) {
-        val view = layoutInflater.inflate(R.layout.dialog_add_item, null)
-
-        val nameInput = view.findViewById<EditText>(R.id.itemNameInput)
-        val priceInput = view.findViewById<EditText>(R.id.itemPriceInput)
-        val categoryInput = view.findViewById<EditText>(R.id.itemCategoryInput)
-
-        nameInput.setText(item.name)
-        priceInput.setText(item.price.toString())
-        categoryInput.setText(item.category)
-
-        AlertDialog.Builder(this)
-            .setTitle("Edit Item")
-            .setView(view)
-            .setPositiveButton("Save") { _, _ ->
-
-                val updatedData = mapOf(
-                    "name" to nameInput.text.toString().trim(),
-                    "price" to priceInput.text.toString().toDoubleOrNull(),
-                    "category" to categoryInput.text.toString().trim(),
-                )
-
-                db.collection("menuItems").document(item.id!!)
-                    .update(updatedData)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Updated!", Toast.LENGTH_SHORT).show()
-                        loadAllCategories()
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun deleteItem(item: MenuItem) {
-        AlertDialog.Builder(this)
-            .setTitle("Delete Item")
-            .setMessage("Remove ${item.name}?")
-            .setPositiveButton("Delete") { _, _ ->
-                db.collection("menuItems").document(item.id!!)
-                    .delete()
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Deleted!", Toast.LENGTH_SHORT).show()
-                        loadAllCategories()
-                    }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        fun fill(item: MenuItem) {
+            nameInput.setText(item.name)
+            priceInput.setText(item.price.toString())
+            categoryInput.setText(item.category)
+        }
     }
 }

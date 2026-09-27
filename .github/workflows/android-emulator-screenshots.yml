@@ -1,0 +1,159 @@
+name: Android Emulator Screenshot Tour
+
+# Manually triggered: boots a real emulator on the runner and walks through
+# the app end-to-end (login, cart, AI chat, checkout, admin dashboard),
+# capturing a screenshot at each screen. Needs live Firebase/Gemini
+# credentials (see repo secrets below), so it's kept separate from the fast
+# unit-test CI in android-ci.yml and not run on every push.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: android-emulator-screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshot-tour:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      # The fast unit-test CI (android-ci.yml) uses a placeholder
+      # google-services.json since it never talks to real Firebase. This job
+      # does, so it needs your actual config.
+      - name: Write real google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Build backend
+        working-directory: backend
+        run: npm run build
+
+      - name: Start backend
+        working-directory: backend
+        env:
+          NODE_ENV: production
+          PORT: 3000
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          nohup node dist/index.js > backend.log 2>&1 &
+          echo $! > backend.pid
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/health >/dev/null; then
+              echo "Backend is up."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Backend did not become healthy in time:"
+          cat backend.log
+          exit 1
+
+      - name: Create throwaway CI test users
+        working-directory: backend
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: npx tsx scripts/ci/createTestUsers.ts /tmp/ci-creds.json
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-33-google_apis-x86_64
+
+      - name: Create AVD snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_5
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "AVD snapshot created."
+
+      - name: Run screenshot tour on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_5
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            export APP_PACKAGE=com.example.cafeshopassignment
+            export APK_PATH=app/build/outputs/apk/debug/app-debug.apk
+            export SCREENSHOT_DIR=$GITHUB_WORKSPACE/screenshots
+            export CREDS_JSON=/tmp/ci-creds.json
+            chmod +x scripts/ci/ui-tour.sh
+            scripts/ci/ui-tour.sh
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-tour
+          path: screenshots/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Clean up CI test users
+        if: always()
+        working-directory: backend
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: npx tsx scripts/ci/deleteTestUsers.ts /tmp/ci-creds.json
+
+      - name: Stop backend
+        if: always()
+        working-directory: backend
+        run: |
+          if [ -f backend.pid ]; then
+            kill "$(cat backend.pid)" 2>/dev/null || true
+          fi
+
+      - name: Upload backend log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-log
+          path: backend/backend.log
+          if-no-files-found: ignore

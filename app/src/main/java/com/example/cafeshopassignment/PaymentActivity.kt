@@ -2,58 +2,49 @@ package com.example.cafeshopassignment
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.*
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import com.example.cafeshopassignment.ui.common.collectWhileStarted
+import com.example.cafeshopassignment.ui.common.formatPrice
+import com.example.cafeshopassignment.ui.common.toast
+import com.example.cafeshopassignment.ui.payment.CardDetails
+import com.example.cafeshopassignment.ui.payment.CardError
+import com.example.cafeshopassignment.ui.payment.CardField
+import com.example.cafeshopassignment.ui.payment.PaymentEvent
+import com.example.cafeshopassignment.ui.payment.PaymentMethod
+import com.example.cafeshopassignment.ui.payment.PaymentUiState
+import com.example.cafeshopassignment.ui.payment.PaymentViewModel
 import com.google.android.material.card.MaterialCardView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 
 class PaymentActivity : AppCompatActivity() {
-
-    private lateinit var db: FirebaseFirestore
-    private lateinit var auth: FirebaseAuth
+    private val viewModel: PaymentViewModel by viewModels { PaymentViewModel.Factory }
 
     private lateinit var cardPaymentRadio: RadioButton
     private lateinit var googlePayRadio: RadioButton
-    private lateinit var cardDetailsSection: android.view.View
-
+    private lateinit var cardDetailsSection: View
     private lateinit var cardNumberInput: EditText
     private lateinit var cardholderNameInput: EditText
     private lateinit var expiryDateInput: EditText
     private lateinit var cvvInput: EditText
-
-    private lateinit var promoCodeInput: EditText
-    private lateinit var applyPromoButton: Button
-
-    private var totalAmount: Double = 0.0
-    private val serviceFee = 0.50
-    private var discountAmount = 0.0
-    private var finalTotal = 0.0
-    private var promoApplied = false
+    private lateinit var subtotalText: TextView
+    private lateinit var serviceFeeText: TextView
+    private lateinit var totalText: TextView
+    private lateinit var payNowButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_payment)
-        title = "Payment"
 
-
-        db = FirebaseFirestore.getInstance()
-        auth = FirebaseAuth.getInstance()
-
-
-        totalAmount = intent.getDoubleExtra("TOTAL_AMOUNT", 0.0)
-        finalTotal = totalAmount + serviceFee
-
-
-        promoCodeInput = findViewById(R.id.promoCodeInput)
-        applyPromoButton = findViewById(R.id.applyPromoButton)
-        val subtotalText = findViewById<TextView>(R.id.subtotalAmount)
-        val serviceFeeText = findViewById<TextView>(R.id.serviceFeeAmount)
-        val totalText = findViewById<TextView>(R.id.totalAmount)
-        val payNowButton = findViewById<Button>(R.id.payNowButton)
-
-
+        subtotalText = findViewById(R.id.subtotalAmount)
+        serviceFeeText = findViewById(R.id.serviceFeeAmount)
+        totalText = findViewById(R.id.totalAmount)
+        payNowButton = findViewById(R.id.payNowButton)
         cardPaymentRadio = findViewById(R.id.cardPaymentRadio)
         googlePayRadio = findViewById(R.id.googlePayRadio)
         cardDetailsSection = findViewById(R.id.cardDetailsSection)
@@ -61,214 +52,90 @@ class PaymentActivity : AppCompatActivity() {
         cardholderNameInput = findViewById(R.id.cardholderNameInput)
         expiryDateInput = findViewById(R.id.expiryDateInput)
         cvvInput = findViewById(R.id.cvvInput)
+        val promoCodeInput = findViewById<EditText>(R.id.promoCodeInput)
 
-        val cardPaymentOption = findViewById<MaterialCardView>(R.id.cardPaymentOption)
-        val googlePayOption = findViewById<MaterialCardView>(R.id.googlePayOption)
-
-
-        subtotalText.text = "£${"%.2f".format(totalAmount)}"
-        serviceFeeText.text = "£${"%.2f".format(serviceFee)}"
-        totalText.text = "£${"%.2f".format(finalTotal)}"
-
-
-        applyPromoButton.setOnClickListener {
-            val code = promoCodeInput.text.toString().trim().uppercase()
-            applyPromoCode(code, totalText)
+        findViewById<Button>(R.id.applyPromoButton).setOnClickListener {
+            viewModel.applyPromo(promoCodeInput.text.toString())
         }
-
-
-        cardPaymentOption.setOnClickListener { selectPaymentMethod("card") }
-        googlePayOption.setOnClickListener { selectPaymentMethod("googlepay") }
-
+        findViewById<MaterialCardView>(R.id.cardPaymentOption).setOnClickListener {
+            viewModel.selectMethod(PaymentMethod.CARD)
+        }
+        findViewById<MaterialCardView>(R.id.googlePayOption).setOnClickListener {
+            viewModel.selectMethod(PaymentMethod.GOOGLE_PAY)
+        }
         cardPaymentRadio.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                cardDetailsSection.visibility = android.view.View.VISIBLE
-                googlePayRadio.isChecked = false
-            }
+            if (isChecked) viewModel.selectMethod(PaymentMethod.CARD)
         }
         googlePayRadio.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                cardDetailsSection.visibility = android.view.View.GONE
-                cardPaymentRadio.isChecked = false
-            }
+            if (isChecked) viewModel.selectMethod(PaymentMethod.GOOGLE_PAY)
         }
-
-
         payNowButton.setOnClickListener {
-            processPayment(finalTotal)
+            viewModel.pay(
+                CardDetails(
+                    number = cardNumberInput.text.toString(),
+                    holderName = cardholderNameInput.text.toString(),
+                    expiry = expiryDateInput.text.toString(),
+                    cvv = cvvInput.text.toString(),
+                ),
+            )
         }
+
+        collectWhileStarted(viewModel.uiState, ::render)
+        collectWhileStarted(viewModel.events, ::handleEvent)
     }
 
-
-    private fun applyPromoCode(code: String, totalText: TextView) {
-        if (code.isEmpty()) {
-            Toast.makeText(this, "Enter promo code first", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (code == "THIRSTY") {
-            discountAmount = (totalAmount + serviceFee) * 0.20
-            finalTotal = (totalAmount + serviceFee) - discountAmount
-            if (finalTotal < 0) finalTotal = 0.0
-            promoApplied = true
-
-            totalText.text = "£${"%.2f".format(finalTotal)}"
-            Toast.makeText(this, "Promo code applied: 20% off!", Toast.LENGTH_SHORT).show()
-        } else {
-            promoApplied = false
-            discountAmount = 0.0
-            finalTotal = totalAmount + serviceFee
-            totalText.text = "£${"%.2f".format(finalTotal)}"
-            Toast.makeText(this, "Invalid promo code", Toast.LENGTH_SHORT).show()
-        }
+    private fun render(state: PaymentUiState) {
+        subtotalText.text = formatPrice(state.summary.subtotal)
+        serviceFeeText.text = formatPrice(state.summary.serviceFee)
+        totalText.text = formatPrice(state.summary.total)
+        cardPaymentRadio.isChecked = state.method == PaymentMethod.CARD
+        googlePayRadio.isChecked = state.method == PaymentMethod.GOOGLE_PAY
+        cardDetailsSection.isVisible = state.method == PaymentMethod.CARD
+        payNowButton.isEnabled = !state.isProcessing
+        payNowButton.text = getString(if (state.isProcessing) R.string.payment_processing else R.string.payment_pay_now)
     }
 
-
-    private fun selectPaymentMethod(method: String) {
-        when (method) {
-            "card" -> {
-                cardPaymentRadio.isChecked = true
-                cardDetailsSection.visibility = android.view.View.VISIBLE
-            }
-            "googlepay" -> {
-                googlePayRadio.isChecked = true
-                cardDetailsSection.visibility = android.view.View.GONE
-            }
-        }
-    }
-
-
-    private fun processPayment(amount: Double) {
-        val currentUser = auth.currentUser ?: run {
-            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-
-        if (cardPaymentRadio.isChecked && !validateCardDetails()) return
-        if (!cardPaymentRadio.isChecked && !googlePayRadio.isChecked) {
-            Toast.makeText(this, "Please select a payment method", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        Toast.makeText(this, "Processing payment...", Toast.LENGTH_SHORT).show()
-
-        val userId = currentUser.uid
-        val cartItems = CartManager.getCart()
-
-
-        db.collection("users").document(userId).get()
-            .addOnSuccessListener { doc ->
-                val firstName = doc.getString("firstname") ?: ""
-                val lastName = doc.getString("surname") ?: ""
-                val customerName = listOf(firstName, lastName)
-                    .filter { it.isNotBlank() }
-                    .joinToString(" ")
-                    .ifBlank {
-                        currentUser.displayName ?: currentUser.email?.substringBefore("@") ?: "Customer"
+    private fun handleEvent(event: PaymentEvent) {
+        when (event) {
+            PaymentEvent.PromoCodeEmpty -> toast(R.string.payment_promo_empty)
+            PaymentEvent.PromoApplied -> toast(R.string.payment_promo_applied)
+            PaymentEvent.PromoInvalid -> toast(R.string.payment_promo_invalid)
+            PaymentEvent.SelectPaymentMethod -> toast(R.string.payment_select_method)
+            is PaymentEvent.InvalidCard -> showCardError(event.error)
+            PaymentEvent.CartEmpty -> toast(R.string.cart_empty)
+            PaymentEvent.NotLoggedIn -> toast(R.string.error_not_logged_in)
+            is PaymentEvent.Failed -> toast(R.string.payment_failed, event.detail.orEmpty())
+            is PaymentEvent.OrderPlaced -> {
+                val intent =
+                    Intent(this, OrderConfirmationActivity::class.java).apply {
+                        putExtra(OrderConfirmationActivity.EXTRA_ORDER_TOTAL, event.total)
+                        putExtra(OrderConfirmationActivity.EXTRA_ORDER_ID, event.orderId)
                     }
-
-
-                val orderData = hashMapOf(
-                    "userId" to userId,
-                    "customerName" to customerName,
-                    "items" to cartItems.map {
-                        mapOf(
-                            "name" to it.name,
-                            "quantity" to it.quantity,
-                            "price" to it.price
-                        )
-                    },
-                    "subtotal" to totalAmount,
-                    "serviceFee" to serviceFee,
-                    "discount" to discountAmount,
-                    "totalPrice" to amount,
-                    "paymentMethod" to getSelectedPaymentMethod(),
-                    "status" to "Pending",
-                    "createdAt" to FieldValue.serverTimestamp(),
-                    "paymentStatus" to "Completed"
-                )
-
-
-                db.collection("orders").add(orderData)
-                    .addOnSuccessListener { orderRef ->
-
-                        val paymentData = hashMapOf(
-                            "orderId" to orderRef.id,
-                            "userId" to userId,
-                            "customerName" to customerName,
-                            "amountPaid" to amount,
-                            "paymentMethod" to getSelectedPaymentMethod(),
-                            "paymentStatus" to "Completed",
-                            "promoApplied" to promoApplied,
-                            "discountAmount" to discountAmount,
-                            "createdAt" to FieldValue.serverTimestamp()
-                        )
-
-                        db.collection("payments").add(paymentData)
-                            .addOnFailureListener { e ->
-                                Toast.makeText(
-                                    this,
-                                    "Failed to record payment: ${e.message}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-
-
-                        CartManager.clear()
-                        val intent = Intent(this, OrderConfirmationActivity::class.java).apply {
-                            putExtra("ORDER_TOTAL", amount)
-                            putExtra("ORDER_ID", orderRef.id)
-                        }
-                        startActivity(intent)
-                        finish()
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(this, "Payment failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
+                startActivity(intent)
+                finish()
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to load user info: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        }
     }
 
-
-    private fun validateCardDetails(): Boolean {
-        val cardNumber = cardNumberInput.text.toString().trim()
-        val cardholderName = cardholderNameInput.text.toString().trim()
-        val expiryDate = expiryDateInput.text.toString().trim()
-        val cvv = cvvInput.text.toString().trim()
-
-        if (cardNumber.isEmpty() || cardNumber.length < 13) {
-            cardNumberInput.error = "Invalid card number"
-            return false
-        }
-        if (cardholderName.isEmpty()) {
-            cardholderNameInput.error = "Enter cardholder name"
-            return false
-        }
-        if (expiryDate.length != 4) {
-            expiryDateInput.error = "Use MMYY format"
-            return false
-        }
-        val month = expiryDate.substring(0, 2).toIntOrNull()
-        if (month == null || month !in 1..12) {
-            expiryDateInput.error = "Invalid month"
-            return false
-        }
-        if (cvv.isEmpty() || cvv.length < 3) {
-            cvvInput.error = "Invalid CVV"
-            return false
-        }
-        return true
-    }
-
-
-    private fun getSelectedPaymentMethod(): String {
-        return when {
-            cardPaymentRadio.isChecked -> "Credit/Debit Card"
-            googlePayRadio.isChecked -> "Google Pay"
-            else -> "Unknown"
-        }
+    private fun showCardError(error: CardError) {
+        val message =
+            getString(
+                when (error) {
+                    CardError.INVALID_NUMBER -> R.string.card_error_number
+                    CardError.MISSING_NAME -> R.string.card_error_name
+                    CardError.EXPIRY_FORMAT -> R.string.card_error_expiry_format
+                    CardError.INVALID_MONTH -> R.string.card_error_month
+                    CardError.INVALID_CVV -> R.string.card_error_cvv
+                },
+            )
+        val field =
+            when (error.field) {
+                CardField.NUMBER -> cardNumberInput
+                CardField.HOLDER_NAME -> cardholderNameInput
+                CardField.EXPIRY -> expiryDateInput
+                CardField.CVV -> cvvInput
+            }
+        field.error = message
+        field.requestFocus()
     }
 }
